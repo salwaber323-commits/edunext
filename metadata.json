@@ -1,0 +1,6 @@
+{
+  "name": "LMS Sekolah Modern",
+  "description": "Platform Pembelajaran Digital dengan antarmuka bersih, cepat, dan navigasi sederhana untuk Guru dan Siswa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
