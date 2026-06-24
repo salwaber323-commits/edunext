@@ -58,6 +58,13 @@ const initialAnnouncements: Post[] = [
   }
 ];
 
+interface Notification {
+  id: string;
+  message: string;
+  type: 'success' | 'update' | 'info';
+  timestamp: string;
+}
+
 export default function App() {
   // --- CORE STATE ---
   const [role, setRole] = useState<UserRole>('siswa');
@@ -86,10 +93,25 @@ export default function App() {
   const [anggotaEkskul, setAnggotaEkskul] = useState<AnggotaEkskul[]>([]);
 
   // REAL-TIME NOTIFICATIONS
-  const [notifications, setNotifications] = useState<string[]>([
-    "✓ Tugas Baru: Limit Fungsi Aljabar (Matematika) dipublish!",
-    "📈 Nilai Baru: Evaluasi KBM Fisika mendapat predikat Sangat Baik (A).",
-    "📢 Pengumuman Baru: Pendaftaran Beasiswa Berprestasi Portofolio Digital resmi dibuka."
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: 'n1',
+      message: "Tugas Baru: Limit Fungsi Aljabar (Matematika) dipublish!",
+      type: 'success',
+      timestamp: 'Baru Saja'
+    },
+    {
+      id: 'n2',
+      message: "Nilai Baru: Evaluasi KBM Fisika mendapat predikat Sangat Baik (A).",
+      type: 'update',
+      timestamp: '2 jam yang lalu'
+    },
+    {
+      id: 'n3',
+      message: "Pengumuman Baru: Pendaftaran Beasiswa Berprestasi Portofolio Digital resmi dibuka.",
+      type: 'info',
+      timestamp: 'Hari Ini'
+    }
   ]);
   const [showNotifPopover, setShowNotifPopover] = useState(false);
 
@@ -238,7 +260,7 @@ export default function App() {
     saveRole(target);
     setSelectedClassId(null);
     setActiveTab('dashboard'); // reset to dashboard
-    alert(`🔄 Peran beralih ke: ${target === 'siswa' ? 'Ahmad (Siswa X IPA 1)' : target === 'guru' ? 'Pak Budi (Wali Kelas)' : 'Ibu Siti Khadijah (Administrator Sekolah)'}`);
+    console.log(`Peran beralih ke: ${target}`);
   };
 
   // Student manual check-in attendance
@@ -288,7 +310,12 @@ export default function App() {
     
     // Real-time notification trigger
     setNotifications(prev => [
-      `📝 Tugas Baru: ${newTug.judul} (${newTug.mapelNama}) untuk Kelas ${kelasList.find(k => k.id === newTug.kelasId)?.nama || ''} telah dipublikasikan!`,
+      {
+        id: `n_${Date.now()}`,
+        message: `Tugas Baru: ${newTug.judul} (${newTug.mapelNama}) untuk Kelas ${kelasList.find(k => k.id === newTug.kelasId)?.nama || ''} telah dipublikasikan!`,
+        type: 'success',
+        timestamp: 'Baru Saja'
+      },
       ...prev
     ]);
 
@@ -300,10 +327,15 @@ export default function App() {
 
     // Real-time notification trigger
     setNotifications(prev => [
-      `📥 Tugas Dikumpulkan: Siswa mengumpulkan jawaban untuk tugas "${tugasList.find(t => t.id === tId)?.judul || ''}".`,
+      {
+        id: `n_${Date.now()}`,
+        message: `Tugas Dikumpulkan: Siswa mengumpulkan jawaban untuk tugas "${tugasList.find(t => t.id === tId)?.judul || ''}".`,
+        type: 'info',
+        timestamp: 'Baru Saja'
+      },
       ...prev
     ]);
-    
+
     await refreshData();
   };
 
@@ -312,7 +344,12 @@ export default function App() {
 
     // Real-time notification trigger
     setNotifications(prev => [
-      `📈 Nilai Rapor diperbarui: Nilai S1/S2 Kurikulum Merdeka telah dikomputasi ulang secara massal.`,
+      {
+        id: `n_${Date.now()}`,
+        message: `Nilai Rapor diperbarui: Nilai S1/S2 Kurikulum Merdeka telah dikomputasi ulang secara massal.`,
+        type: 'update',
+        timestamp: 'Baru Saja'
+      },
       ...prev
     ]);
 
@@ -324,7 +361,12 @@ export default function App() {
 
     // Real-time notification trigger
     setNotifications(prev => [
-      `💯 Pengumuman Nilai: Guru memberikan penilaian dan input nilai ${score} untuk pengumpulan tugas.`,
+      {
+        id: `n_${Date.now()}`,
+        message: `Pengumuman Nilai: Guru memberikan penilaian dan input nilai ${score} untuk pengumpulan tugas.`,
+        type: 'success',
+        timestamp: 'Baru Saja'
+      },
       ...prev
     ]);
 
@@ -535,91 +577,87 @@ export default function App() {
       <div className="flex-1 flex flex-col lg:pl-[260px] min-w-0">
         
         {/* TOP STATUS HEADER BAR */}
-        <header className={`sticky top-0 backdrop-blur-md py-3.5 px-4 md:px-6 flex items-center justify-between z-10 transition-all ${
-          role === 'admin'
-            ? 'bg-purple-50/95 border-b border-purple-900/10 shadow-sm shadow-[#f3f0f7]/30'
-            : role === 'guru' 
-              ? 'bg-[#f4f7f6]/95 border-b border-teal-900/10 shadow-sm shadow-[#e2e8e6]/30' 
-              : 'bg-white/95 border-b border-slate-150/80 shadow-sm'
-        }`}>
-          <div className="flex items-center gap-3">
+        <header className="glass-header py-4 px-4 md:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="lg:hidden p-2 hover:bg-slate-50 text-slate-600 rounded-xl transition-all"
+              className="lg:hidden p-2 hover:bg-slate-100 text-slate-600 rounded-xl transition-all"
             >
               <Menu size={20} />
             </button>
             
-            <div className="flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${role === 'admin' ? 'bg-purple-600' : role === 'guru' ? 'bg-emerald-500' : 'bg-blue-600'}`}></span>
-              <h2 className="text-sm font-extrabold text-slate-800 capitalize select-none tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 font-sans">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className={`h-1.5 w-1.5 rounded-full ${role === 'admin' ? 'bg-purple-600' : role === 'guru' ? 'bg-emerald-500' : 'bg-blue-600'}`}></span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  {role === 'admin' ? 'Administrator' : role === 'guru' ? 'Faculty Member' : role === 'osis' ? 'Student Organization' : 'Student Portal'}
+                </span>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-oxford tracking-tight">
                 {selectedClassId 
-                  ? `Kelas ${kelasList.find(k => k.id === selectedClassId)?.nama || 'X IPA 1'}` 
-                  : activeTab === 'dashboard' ? (role === 'admin' ? 'Kendalitas Administrator' : role === 'guru' ? 'Dasbor Guru' : 'Dasbor Siswa') : activeTab.toUpperCase()}
+                  ? `Class: ${kelasList.find(k => k.id === selectedClassId)?.nama || 'X IPA 1'}` 
+                  : activeTab === 'dashboard' ? (role === 'admin' ? 'Control Center' : role === 'guru' ? 'Teacher Overview' : role === 'osis' ? 'Kesiswaan Dashboard' : 'Dashboard') : activeTab.replace('_', ' ').toUpperCase()}
               </h2>
             </div>
           </div>
 
           {/* Quick Cross-Roles Interaction Panel */}
-          <div className="flex items-center gap-2.5 sm:gap-4">
+          <div className="flex items-center gap-3 md:gap-6">
             
-            {/* Top Bar Role Warning Bar */}
-            <div className={`hidden sm:flex items-center gap-1.5 text-[10px] md:text-xs border py-1.5 px-3 rounded-xl font-bold ${
-              role === 'admin'
-                ? 'bg-purple-50 text-purple-700 border-purple-100'
-                : role === 'guru'
-                  ? 'bg-emerald-50/50 text-emerald-700 border-emerald-100/50'
-                  : 'bg-blue-50/50 text-blue-700 border-blue-50'
-            }`}>
-              <Info size={13} />
-              <span>Simulasi: {role === 'siswa' ? 'Ahmad (Siswa)' : role === 'guru' ? 'Wali Kelas (Pak Budi)' : 'Ibu Siti (Admin)'}.</span>
-            </div>
-
             {/* REAL-TIME NOTIFICATION BELL POPOVER */}
             <div className="relative">
               <button
                 onClick={() => setShowNotifPopover(!showNotifPopover)}
-                className={`p-2 rounded-xl border transition-all cursor-pointer relative ${
-                  role === 'admin'
-                    ? 'bg-purple-100 text-purple-700 border-purple-200'
-                    : role === 'guru'
-                      ? 'bg-emerald-100/55 text-emerald-700 border-emerald-200/50'
-                      : 'bg-blue-100/55 text-blue-700 border-blue-100'
-                }`}
+                className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-all relative shadow-sm"
                 title="Sistem Notifikasi Sekolah"
               >
-                <Bell size={14} />
+                <Bell size={18} strokeWidth={2.5} />
                 {notifications.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white font-black text-[8px] h-4 w-4 rounded-full flex items-center justify-center animate-bounce">
+                  <span className="absolute -top-1 -right-1 bg-bronze text-white font-black text-[8px] h-4.5 w-4.5 rounded-full flex items-center justify-center ring-2 ring-white">
                     {notifications.length}
                   </span>
                 )}
               </button>
 
               {showNotifPopover && (
-                <div className="absolute right-0 mt-2.5 w-64 sm:w-80 bg-white border border-slate-150 rounded-2xl shadow-xl p-4 text-slate-800 z-50 animated-fade space-y-3">
-                  <div className="flex items-center justify-between border-b pb-2">
-                    <span className="font-extrabold text-xs text-slate-500 uppercase tracking-wide">Pusat Notifikasi Real-time</span>
+                <div className="absolute right-0 mt-3 w-72 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-premium p-0 text-slate-800 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/50">
+                    <span className="font-bold text-xs text-slate-500 uppercase tracking-widest">Notifications</span>
                     {notifications.length > 0 && (
                       <button
                         onClick={() => {
                           setNotifications([]);
-                          alert("✓ Semua notifikasi telah ditandai sebagai terbaca.");
                         }}
-                        className="text-[10px] text-indigo-600 hover:underline font-bold cursor-pointer"
+                        className="text-[10px] text-bronze hover:underline font-bold cursor-pointer"
                       >
-                        Bersihkan
+                        Clear all
                       </button>
                     )}
                   </div>
 
-                  <div className="divide-y divide-slate-100 max-h-60 overflow-y-auto space-y-2 font-sans">
+                  <div className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
                     {notifications.length === 0 ? (
-                      <p className="text-[11px] text-slate-400 text-center py-4 font-normal">Tidak ada notifikasi baru hari ini.</p>
+                      <div className="py-12 text-center">
+                        <Bell className="mx-auto text-slate-200 mb-2" size={32} />
+                        <p className="text-xs text-slate-400 font-medium">No new notifications</p>
+                      </div>
                     ) : (
-                      notifications.map((notif, index) => (
-                        <div key={index} className="text-[11px] font-medium text-slate-700 py-1.5 leading-relaxed border-b last:border-b-0 border-slate-50">
-                          {notif}
+                      notifications.map((notif) => (
+                        <div key={notif.id} className="p-4 hover:bg-slate-50/50 transition-colors flex gap-3 border-b last:border-0 border-slate-50">
+                          <div className={`mt-0.5 h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${
+                            notif.type === 'success' ? 'bg-emerald-50 text-emerald-600' :
+                            notif.type === 'update' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
+                          }`}>
+                            {notif.type === 'success' && <Check size={16} strokeWidth={3} />}
+                            {notif.type === 'update' && <Sparkles size={16} strokeWidth={3} />}
+                            {notif.type === 'info' && <Info size={16} strokeWidth={3} />}
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-[11px] font-semibold text-oxford leading-relaxed">
+                              {notif.message}
+                            </p>
+                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wide">{notif.timestamp}</span>
+                          </div>
                         </div>
                       ))
                     )}
@@ -628,28 +666,18 @@ export default function App() {
               )}
             </div>
 
-            <button
-              onClick={() => handleToggleAndSwitchRole()}
-              id="top-role-switch-btn"
-              className={`text-white text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer ${
-                role === 'admin'
-                  ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-100'
-                  : role === 'guru'
-                    ? 'bg-teal-700 hover:bg-teal-800 shadow-teal-100'
-                    : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100'
-              }`}
-            >
-              <RefreshCw size={11} /> Ganti Peran
-            </button>
-
-            {/* Quick avatar badge */}
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-100">
+            <div className="flex items-center gap-3 pl-3 md:pl-6 border-l border-slate-200">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-bold text-oxford leading-none mb-1">{currentUserName}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  {role === 'admin' ? 'Super Admin' : role === 'guru' ? 'Faculty' : role === 'osis' ? 'OSIS Board' : 'X IPA 1'}
+                </p>
+              </div>
               <img 
                 src={role === 'admin' ? adminUserObj.avatar : role === 'siswa' ? studentUserObj.avatar : teacherUserObj.avatar} 
-                alt="Profile Avatar" 
-                className={`h-8.5 w-8.5 rounded-full object-cover border ${role === 'admin' ? 'border-purple-500' : role === 'guru' ? 'border-teal-500' : 'border-blue-500'}`} 
+                alt="Profile" 
+                className="h-10 w-10 rounded-xl object-cover border-2 border-white shadow-sm ring-1 ring-slate-100" 
               />
-              <span className="text-xs font-bold text-slate-700 hidden md:block">{currentUserName}</span>
             </div>
           </div>
         </header>

@@ -1,4 +1,4 @@
-import { BookOpen, Calendar, Clock, AlertCircle, CheckCircle, FileText, Award, Users, MapPin, Zap } from 'lucide-react';
+import { BookOpen, Calendar, Clock, CheckCircle, FileText, Award, MapPin, Zap } from 'lucide-react';
 import { MataPelajaran, Tugas, AbsensiPertemuan, PengumpulanTugas, Kegiatan, Ekstrakurikuler } from '../types';
 
 interface DashboardSiswaProps {
@@ -33,91 +33,107 @@ export default function DashboardSiswa({
   onRegisterKegiatan,
   onJoinEkskul
 }: DashboardSiswaProps) {
-  // Mock monthly stats
-  const attendanceStats = {
-    hadir: 20,
-    izin: 1,
-    sakit: 0,
-    alpha: 0
-  };
-
   // Check if student has checked in for each active attendance
   const hasCheckedIn = (absId: string) => {
     const abs = activeAbsensi.find(a => a.id === absId);
     return abs ? abs.kehadiran[student.id] === 'Hadir' : false;
   };
 
+  const pendingAssignments = upcomings.filter(t => !pengumpulan.find(p => p.tugasId === t.id && p.status === 'Sudah')).length;
+
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto px-1">
+    <div className="space-y-8 w-full max-w-7xl mx-auto pb-10">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-6 md:p-8 text-white shadow-md relative overflow-hidden">
-        <div className="relative z-10">
-          <span className="bg-blue-400 bg-opacity-30 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full mb-3 inline-block">
-            Siswa Aktif
-          </span>
-          <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
-            Halo, {student.nama}
-          </h1>
-          <p className="text-blue-100 mt-2 text-sm md:text-base max-w-lg">
-            Selamat datang kembali di LMS Sekolah Modern. Pantau jadwal hari ini, selesaikan tugas, dan pelajari materi baru.
-          </p>
+      <div className="relative rounded-3xl overflow-hidden shadow-premium group">
+        <div className="absolute inset-0 bg-oxford">
+           <img 
+             src="https://images.unsplash.com/photo-1635776062360-af423602aff3?auto=format&fit=crop&q=80&w=1600" 
+             className="w-full h-full object-cover opacity-20 mix-blend-overlay transition-transform duration-700 group-hover:scale-105"
+             alt="Academic Background" 
+           />
+           <div className="absolute inset-0 bg-gradient-to-r from-oxford via-oxford/80 to-transparent"></div>
         </div>
-        <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-10 hidden md:block">
-          <BookOpen size={200} />
+        
+        <div className="relative z-10 p-8 md:p-12 text-white">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="bg-bronze/20 text-bronze border border-bronze/30 text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full">
+              Student Academic Portal
+            </span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight mb-3">
+            Welcome back, <span className="text-bronze">{student.nama.split(' ')[0]}</span>.
+          </h1>
+          <p className="text-slate-300 text-sm md:text-lg max-w-xl leading-relaxed">
+            Your academic progress is on track. You have <span className="text-white font-bold">{pendingAssignments} pending assignments</span> to review today.
+          </p>
+          
+          <div className="flex flex-wrap gap-4 mt-8">
+            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-4 min-w-[140px]">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Attendance Rate</p>
+              <p className="text-2xl font-serif font-bold text-white">98.5%</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-4 min-w-[140px]">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">GPA Equivalent</p>
+              <p className="text-2xl font-serif font-bold text-white">3.92</p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Grid Utama (Hari Ini & Tugas Mendatang & Absensi) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Kolom Kiri: Jadwal & Absensi Hari Ini (8 cols) */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-8">
           
           {/* Absensi Hari ini Alert */}
           {activeAbsensi.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 border border-blue-100 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Clock className="text-blue-600" size={20} />Pertemuan Hari Ini &amp; Absensi
-                </h3>
-                <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">
-                  Absensi Dibuka
+            <div className="card-premium p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <Clock size={20} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-oxford">Mandatory Check-in</h3>
+                    <p className="text-xs text-slate-400 font-medium">Please confirm your attendance for current sessions.</p>
+                  </div>
+                </div>
+                <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100">
+                  Active Session
                 </span>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {activeAbsensi.map(abs => {
                   const checkedIn = hasCheckedIn(abs.id);
                   return (
                     <div 
                       key={abs.id} 
-                      id={`abs-card-${abs.id}`}
-                      className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all ${
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border transition-all ${
                         checkedIn 
-                          ? 'bg-emerald-50/50 border-emerald-100' 
-                          : 'bg-indigo-50/30 border-blue-50 hover:bg-indigo-50/60'
+                          ? 'bg-slate-50/50 border-slate-100' 
+                          : 'bg-white border-blue-100 shadow-sm ring-1 ring-blue-50'
                       }`}
                     >
-                      <div className="mb-3 sm:mb-0">
-                        <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded mb-1 inline-block">
+                      <div className="mb-4 sm:mb-0">
+                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1 inline-block">
                           {abs.mapelNama}
                         </span>
-                        <h4 className="font-bold text-slate-800 text-base">Hadir KBM - Tanggal {abs.tanggal}</h4>
-                        <p className="text-xs text-slate-500 mt-0.5">Konfirmasikan kehadiran Anda sebelum kelas selesai.</p>
+                        <h4 className="font-bold text-oxford text-lg">{abs.tanggal} • Academic Session</h4>
                       </div>
                       
                       <div className="flex items-center">
                         {checkedIn ? (
-                          <div id="check-success-msg" className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg text-sm font-semibold">
-                            <CheckCircle size={16} /> Kehadiran Berhasil Dicatat
+                          <div className="flex items-center gap-2 text-sage font-bold text-sm">
+                            <CheckCircle size={18} strokeWidth={3} /> Registered
                           </div>
                         ) : (
                           <button
-                            id={`btn-absen-${abs.id}`}
                             onClick={() => onCheckIn(abs.mapelId)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all hover:shadow cursor-pointer w-full sm:w-auto text-center"
+                            className="bg-oxford hover:bg-slate-800 text-white px-8 py-3 rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer w-full sm:w-auto text-center tracking-widest uppercase"
                           >
-                            Hadir
+                            Mark Attendance
                           </button>
                         )}
                       </div>
@@ -129,38 +145,50 @@ export default function DashboardSiswa({
           )}
 
           {/* Hari Ini Schedules */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <Calendar className="text-blue-600" size={20} /> Jadwal Belajar Hari Ini
-            </h3>
+          <div className="card-premium p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <Calendar size={20} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-oxford">Academic Schedule</h3>
+                <p className="text-xs text-slate-400 font-medium">Your synchronized daily curriculum.</p>
+              </div>
+            </div>
             
             {schedules.length === 0 ? (
-              <div className="p-6 text-center border-2 border-dashed border-slate-100 rounded-xl text-slate-400">
-                Tidak ada pelajaran yang dijadwalkan hari ini.
+              <div className="p-12 text-center border-2 border-dashed border-slate-100 rounded-2xl text-slate-400 font-medium text-sm">
+                No compulsory sessions scheduled for today.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {schedules.map((sched, idx) => (
                   <div 
                     key={sched.id} 
-                    id={`sched-card-${sched.id}`}
-                    className="p-5 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-slate-50 transition-colors relative"
+                    className="p-6 rounded-2xl border border-slate-100 bg-white hover:border-blue-200 transition-all hover:shadow-md relative group"
                   >
                     <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                          KBM Ke-{idx + 1}
+                      <div className="space-y-3">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                          Session {idx + 1}
                         </span>
-                        <h4 onClick={() => onNavigateToTab('kelas', sched.kelasId)} className="font-bold text-slate-800 text-lg mt-2 cursor-pointer hover:text-blue-600 transition-colors">
+                        <h4 
+                          onClick={() => onNavigateToTab('kelas', sched.kelasId)} 
+                          className="font-serif font-bold text-xl text-oxford cursor-pointer hover:text-bronze transition-colors"
+                        >
                           {sched.nama}
                         </h4>
-                        <p className="text-xs text-slate-500 mt-1">Kelas: {sched.kelasId === 'kelas_x_ipa_1' ? 'X IPA 1' : 'XI IPA 2'}</p>
+                        <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
+                           <div className="flex items-center gap-1.5">
+                              <Clock size={14} className="text-slate-400" />
+                              {sched.jadwalWaktu} WIB
+                           </div>
+                           <div className="flex items-center gap-1.5">
+                              <MapPin size={14} className="text-slate-400" />
+                              Hall B
+                           </div>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 text-slate-600 mt-4 pt-4 border-t border-slate-100 text-sm">
-                      <Clock size={16} className="text-slate-400" />
-                      <span>{sched.jadwalWaktu} WIB</span>
                     </div>
                   </div>
                 ))}
@@ -170,67 +198,66 @@ export default function DashboardSiswa({
         </div>
 
         {/* Kolom Kanan: Tugas & Absensi Month (4 cols) */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4 space-y-8">
           
           {/* Tugas Mendatang */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-slate-800 flex items-center gap-1.5">
-                <FileText className="text-blue-600" size={18} /> Tugas Mendatang
+          <div className="card-premium p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-sm font-bold text-oxford uppercase tracking-widest flex items-center gap-2">
+                <FileText className="text-bronze" size={16} /> Compulsory Tasks
               </h3>
               <button 
                 onClick={() => onNavigateToTab('tugas')}
-                className="text-blue-600 hover:text-blue-700 text-xs font-semibold transition-colors"
+                className="text-bronze hover:text-amber-700 text-[10px] font-bold uppercase tracking-widest transition-colors"
               >
-                Lihat Semua
+                View All
               </button>
             </div>
 
             {upcomings.length === 0 ? (
-              <p className="text-center text-slate-400 text-sm py-4 border border-dashed border-slate-100 rounded-xl">
-                Alhamdulillah, tidak ada tugas sekolah mendesak.
-              </p>
+              <div className="text-center py-10 border border-dashed border-slate-100 rounded-xl">
+                 <p className="text-xs text-slate-400 font-medium italic">No pending assignments.</p>
+              </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {upcomings.map(tugas => {
                   const statusSelesai = pengumpulan.find(p => p.tugasId === tugas.id && p.status === 'Sudah');
                   return (
                     <div 
                       key={tugas.id} 
-                      id={`tugas-card-${tugas.id}`}
-                      className="p-4 rounded-xl border border-slate-50 hover:border-slate-100 bg-slate-50/40 hover:bg-slate-50 transition-colors"
+                      className="p-4 rounded-xl border border-slate-50 bg-slate-50/30 hover:bg-white transition-all hover:shadow-sm"
                     >
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-4 mb-3">
                         <div>
-                          <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                          <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1 block">
                             {tugas.mapelNama}
                           </span>
                           <h4 
                             onClick={() => onNavigateToTab('kelas', tugas.kelasId)}
-                            className="font-semibold text-slate-800 text-sm mt-1.5 hover:text-blue-600 cursor-pointer line-clamp-1 transition-colors"
+                            className="font-bold text-oxford text-sm hover:text-bronze cursor-pointer transition-colors"
                           >
                             {tugas.judul}
                           </h4>
                         </div>
                         {statusSelesai ? (
-                          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-semibold px-2 py-0.5 rounded shrink-0">
-                            Selesai
-                          </span>
+                          <div className="h-6 w-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                            <CheckCircle size={14} strokeWidth={3} />
+                          </div>
                         ) : (
-                          <span className="bg-amber-100 text-amber-800 text-[10px] font-semibold px-2 py-0.5 rounded shrink-0">
-                            2 hari lagi
-                          </span>
+                          <div className="h-6 w-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                            <Clock size={14} strokeWidth={3} />
+                          </div>
                         )}
                       </div>
                       
-                      <div className="text-xs text-slate-500 mt-2 flex items-center justify-between">
-                        <span>Batas: {tugas.deadline}</span>
+                      <div className="flex items-center justify-between mt-2 pt-3 border-t border-slate-100">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Due: {tugas.deadline}</span>
                         {!statusSelesai && (
                           <button 
                             onClick={() => onNavigateToTab('kelas')} 
-                            className="text-blue-600 font-semibold hover:underline"
+                            className="text-[10px] font-black text-oxford hover:text-bronze uppercase tracking-widest"
                           >
-                            Kumpul
+                            Submit
                           </button>
                         )}
                       </div>
@@ -241,100 +268,78 @@ export default function DashboardSiswa({
             )}
           </div>
 
-          {/* Absensi Rekap Month */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-            <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-1.5">
-              <Award className="text-blue-600" size={18} /> Absensi Bulan Ini
+          {/* Academic Records Metric */}
+          <div className="card-premium p-6 bg-oxford text-white border-0">
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <Zap className="text-bronze" size={14} /> Academic Standing
             </h3>
             
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
-                <div className="text-2xl font-bold text-emerald-600">{attendanceStats.hadir}</div>
-                <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Hadir</div>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
-                <div className="text-2xl font-bold text-blue-600">{attendanceStats.izin}</div>
-                <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Izin</div>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
-                <div className="text-2xl font-bold text-amber-500">{attendanceStats.sakit}</div>
-                <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Sakit</div>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
-                <div className="text-2xl font-bold text-rose-500">{attendanceStats.alpha}</div>
-                <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Alpha</div>
-              </div>
-            </div>
-            
-            <div className="mt-4 p-3 bg-blue-50/50 rounded-xl border border-blue-50 text-xs text-blue-700 flex items-start gap-2">
-              <span className="font-bold">Info:</span>
-              <p>Rasio kehadiran Anda bulan ini adalah 95%. Pertahankan keaktifan belajar Anda!</p>
+            <div className="space-y-6">
+               <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                     <p className="text-2xl font-serif font-bold text-white leading-none">Excellent</p>
+                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Global Ranking: Top 5%</p>
+                  </div>
+                  <div className="h-12 w-12 rounded-full border-2 border-bronze flex items-center justify-center text-bronze font-black text-sm">
+                     A+
+                  </div>
+               </div>
+
+               <div className="space-y-2">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                     <span>Semester Progress</span>
+                     <span>82%</span>
+                  </div>
+                  <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                     <div className="h-full bg-bronze rounded-full" style={{ width: '82%' }}></div>
+                  </div>
+               </div>
             </div>
           </div>
 
-          {/* Pengumuman & Kegiatan OSIS (NEW) */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-            <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-1.5">
-              <Zap className="text-amber-500" size={18} /> Kegiatan Sekolah Mendatang
-            </h3>
+          {/* Activity Bulletin */}
+          <div className="card-premium p-6">
+            <h3 className="text-[10px] font-bold text-oxford uppercase tracking-widest mb-4">Upcoming Engagements</h3>
             <div className="space-y-4">
-              {kegiatan.length === 0 ? (
-                <p className="text-[11px] text-slate-400 italic">Belum ada kegiatan kesiswaan terdaftar.</p>
-              ) : (
-                kegiatan.map(k => (
-                  <div key={k.id} className="p-4 rounded-xl border border-slate-50 bg-slate-50/30 hover:bg-white hover:shadow-md transition-all">
-                    <div className="flex justify-between items-start mb-2">
-                       <span className="text-[9px] font-black uppercase text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{k.kategori}</span>
-                       <span className="text-[9px] font-bold text-slate-400">{k.tanggal}</span>
-                    </div>
-                    <h4 className="text-sm font-bold text-slate-800 leading-tight">{k.judul}</h4>
-                    <p className="text-[11px] text-slate-500 mt-1 line-clamp-1 flex items-center gap-1">
-                      <MapPin size={10} /> {k.lokasi || 'Sekolah'}
-                    </p>
-                    <button 
-                      onClick={() => onRegisterKegiatan(k.id)}
-                      className="mt-3 w-full bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white py-2 rounded-lg text-[10px] font-black uppercase transition-all"
-                    >
-                      Daftar Peserta
-                    </button>
+              {kegiatan.slice(0, 2).map(k => (
+                <div key={k.id} className="group cursor-pointer">
+                  <div className="flex items-center gap-3 mb-2">
+                     <span className="text-[9px] font-bold text-bronze uppercase tracking-widest">{k.kategori}</span>
+                     <span className="text-[9px] text-slate-400 font-medium">{k.tanggal}</span>
                   </div>
-                ))
-              )}
+                  <h4 className="text-sm font-bold text-oxford group-hover:text-bronze transition-colors line-clamp-1">{k.judul}</h4>
+                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed font-medium">
+                    Location: {k.lokasi || 'Grand Hall'}
+                  </p>
+                  <button 
+                    onClick={() => onRegisterKegiatan(k.id)}
+                    className="mt-3 w-full bg-slate-50 text-oxford hover:bg-oxford hover:text-white py-2 rounded-lg text-[9px] font-black uppercase transition-all border border-slate-100"
+                  >
+                    Register
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Ekstrakurikuler (NEW) */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-            <h3 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-1.5">
-              <Users className="text-indigo-600" size={18} /> Bergabung Ekstrakurikuler
-            </h3>
-            <div className="grid grid-cols-1 gap-3">
-              {ekskul.length === 0 ? (
-                <p className="text-[11px] text-slate-400 italic">Data ekstrakurikuler belum tersedia.</p>
-              ) : (
-                ekskul.map(e => (
-                  <div key={e.id} className="flex items-center justify-between p-3 border border-slate-50 rounded-xl hover:border-indigo-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shrink-0">
-                        <Users size={20} />
-                      </div>
-                      <div className="overflow-hidden">
-                        <h4 className="text-xs font-bold text-slate-800 truncate">{e.nama}</h4>
-                        <p className="text-[10px] text-slate-400 font-bold truncate">Jadwal: {e.jadwal}</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        onJoinEkskul(e.id);
-                        alert(`Terima kasih! Pendaftaran ${e.nama} sedang diproses.`);
-                      }}
-                      className="ml-2 text-[10px] font-black text-white bg-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-200"
-                    >
-                      GABUNG
-                    </button>
+          {/* Ekstrakurikuler */}
+          <div className="card-premium p-6">
+            <h3 className="text-[10px] font-bold text-oxford uppercase tracking-widest mb-4">Organizations</h3>
+            <div className="space-y-4">
+              {ekskul.slice(0, 3).map(e => (
+                <div key={e.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-white transition-all">
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-bold text-oxford truncate">{e.nama}</h4>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase">{e.jadwal}</p>
                   </div>
-                ))
-              )}
+                  <button 
+                    onClick={() => onJoinEkskul(e.id)}
+                    className="text-[9px] font-black text-white bg-oxford px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-all shadow-sm"
+                  >
+                    JOIN
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
 

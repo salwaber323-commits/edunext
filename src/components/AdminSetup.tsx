@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
-  FolderLock, Server, ShieldCheck, Plus, Trash2, 
-  UserPlus, FileCheck, Layers, BookOpen, Clock, Users,
-  BookMarked, Download, Printer, Eye, Settings, HelpCircle, CheckCircle2, AlertCircle, ShieldAlert
+  FolderLock, Server, Plus, Trash2, 
+  UserPlus, Layers, BookOpen, Clock,
+  Printer, Settings, CheckCircle2, AlertCircle, ShieldAlert,
+  Download, UploadCloud, ArrowRight
 } from 'lucide-react';
-import { User, Kelas, MataPelajaran, RaporP5, NilaiSiswa } from '../types';
+import { User, Kelas, RaporP5, NilaiSiswa } from '../types';
 
 interface AdminSetupProps {
   kelas: Kelas[];
@@ -47,20 +48,15 @@ export default function AdminSetup({
 }: AdminSetupProps) {
   const [activeSubTab, setActiveSubTab] = useState<'akademik' | 'kelas' | 'siswa' | 'guru' | 'rapor'>('akademik');
   
-  // Year/Semester States
   const [tahunAjaran, setTahunAjaran] = useState(PropTahunAjaran);
   const [semesterTipe, setSemesterTipe] = useState<'Ganjil' | 'Genap'>(PropSemester);
   const [isTaSaved, setIsTaSaved] = useState(false);
 
-  // Class Form States
   const [newKelasNama, setNewKelasNama] = useState('');
-
-  // Student Form States
   const [newSiswaNama, setNewSiswaNama] = useState('');
   const [newSiswaNisn, setNewSiswaNisn] = useState('');
   const [selectedClassIdForNewSiswa, setSelectedClassIdForNewSiswa] = useState(kelas[0]?.id || 'kelas_x_ipa_1');
 
-  // Teacher Mappings Mock State
   const [guruAssignments, setGuruAssignments] = useState([
     { id: 'ga_1', namaGuru: 'Pak Budi Hartono, S.Pd.', mapel: 'Matematika', kelas: 'X IPA 1' },
     { id: 'ga_2', namaGuru: 'Ibu Ratna Dewi, M.Pd.', mapel: 'Fisika', kelas: 'XI IPA 2' },
@@ -70,14 +66,12 @@ export default function AdminSetup({
   const [newGuruMapel, setNewGuruMapel] = useState('Matematika');
   const [newGuruKelas, setNewGuruKelas] = useState('X IPA 1');
 
-  // Mass Print States
   const [selectedClassForReport, setSelectedClassForReport] = useState(kelas[0]?.id || 'kelas_x_ipa_1');
   const [isGeneratingMassReport, setIsGeneratingMassReport] = useState(false);
   const [massReportProgress, setMassReportProgress] = useState(0);
   const [activePreviewStudent, setActivePreviewStudent] = useState<User | null>(null);
   const [previewReportType, setPreviewReportType] = useState<'akademik' | 'p5'>('akademik');
 
-  // SYSTEM.MD COMPLIANT STATES: Excel Import, Promotion, Alumni filters
   const [siswaRegistrationMode, setSiswaRegistrationMode] = useState<'individual' | 'excel'>('individual');
   const [excelSiswaText, setExcelSiswaText] = useState('');
   
@@ -104,7 +98,6 @@ export default function AdminSetup({
       jumlahSiswa: 0
     });
     setNewKelasNama('');
-    alert(`Kelas ${newKelasNama} berhasil dibuat!`);
   };
 
   const handleAddSiswaSubmit = (e: React.FormEvent) => {
@@ -117,7 +110,6 @@ export default function AdminSetup({
     });
     setNewSiswaNama('');
     setNewSiswaNisn('');
-    alert(`Siswa ${newSiswaNama} berhasil didaftarkan!`);
   };
 
   const handleAddGuruAssignment = (e: React.FormEvent) => {
@@ -131,7 +123,6 @@ export default function AdminSetup({
     };
     setGuruAssignments([...guruAssignments, newAss]);
     setNewGuruNama('');
-    alert(`Guru ${newGuruNama} ditugaskan untuk mapel ${newGuruMapel} di kelas ${newGuruKelas}`);
   };
 
   const handleGenerateMassReport = () => {
@@ -142,7 +133,6 @@ export default function AdminSetup({
         if (prev >= 100) {
           clearInterval(interval);
           setIsGeneratingMassReport(false);
-          alert("✓ Seluruh laporan rapor kelas berhasil digenerate dan siap diunduh dalam format berkas ZIP.");
           return 100;
         }
         return prev + 10;
@@ -152,55 +142,50 @@ export default function AdminSetup({
 
   const getKKTPGrade = (val: number | string) => {
     const n = Number(val);
-    if (n >= 91) return { text: 'Sangat Baik (A)', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
-    if (n >= 81) return { text: 'Baik (B)', color: 'bg-blue-100 text-blue-800 border-blue-200' };
-    if (n >= 71) return { text: 'Cukup (C)', color: 'bg-amber-100 text-amber-800 border-amber-200' };
-    return { text: 'Perlu Intervensi (D)', color: 'bg-rose-100 text-rose-800 border-rose-200' };
+    if (n >= 91) return { text: 'Excellent (A)', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' };
+    if (n >= 81) return { text: 'Good (B)', color: 'bg-blue-50 text-blue-700 border-blue-100' };
+    if (n >= 71) return { text: 'Satisfactory (C)', color: 'bg-amber-50 text-amber-700 border-amber-100' };
+    return { text: 'Needs Intervention (D)', color: 'bg-rose-50 text-rose-700 border-rose-100' };
   };
 
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto px-1">
+    <div className="space-y-8 w-full max-w-7xl mx-auto pb-10">
       {/* Premium Dashboard Header */}
-      <div className="bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950 rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden border border-purple-500/20">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="bg-oxford rounded-3xl p-8 md:p-12 text-white shadow-premium relative overflow-hidden border border-white/10">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
           <div>
-            <span className="bg-purple-500/30 text-purple-200 text-[10px] font-extrabold tracking-widest uppercase px-3 py-1 rounded-full mb-3 inline-block border border-purple-500/20 font-mono">
-              Sistem Administrator • Keamanan Super
+            <span className="bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-6 inline-block font-sans">
+              System Administrator • Root Access Verified
             </span>
-            <h1 className="text-3xl font-black tracking-tight font-sans">
-              Instalasi &amp; Kontrol Akademik
+            <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight leading-tight">
+              Curriculum Control Center
             </h1>
-            <p className="text-purple-200 mt-2 text-sm max-w-xl leading-relaxed">
-              Konfigurasi master Kurikulum Merdeka SMAM Muslimin Cililin. Kelola tahun ajaran aktif, semester, penugasan guru pengampu, rincian murid, hingga cetak rapor massal otomatis.
+            <p className="text-slate-400 mt-4 text-sm md:text-lg max-w-xl leading-relaxed font-medium">
+              Global configuration for academic cycles. Manage cohorts, faculty assignments, student enrollment, and automated transcript generation.
             </p>
           </div>
-          <div className="flex gap-3 bg-purple-950/60 p-4 rounded-xl border border-purple-800/30 shadow-inner shrink-0 self-start md:self-auto">
-            <div className="text-center font-mono">
-              <div className="text-xl font-bold font-sans text-purple-300">{kelas.length}</div>
-              <div className="text-[9px] font-extrabold text-purple-400 uppercase tracking-wider">Kelas</div>
+          <div className="flex gap-8 bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-inner shrink-0">
+            <div className="text-center">
+              <div className="text-3xl font-serif font-bold text-white">{kelas.length}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Cohorts</div>
             </div>
-            <div className="h-8 w-[1px] bg-purple-800 self-center"></div>
-            <div className="text-center font-mono">
-              <div className="text-xl font-bold font-sans text-purple-300">{siswaList.length}</div>
-              <div className="text-[9px] font-extrabold text-purple-400 uppercase tracking-wider">Murid</div>
-            </div>
-            <div className="h-8 w-[1px] bg-purple-800 self-center"></div>
-            <div className="text-center font-mono">
-              <div className="text-xl font-bold font-sans text-purple-300">{materiCount + tugasCount}</div>
-              <div className="text-[9px] font-extrabold text-purple-400 uppercase tracking-wider">KBM</div>
+            <div className="h-10 w-[1px] bg-white/10 self-center"></div>
+            <div className="text-center">
+              <div className="text-3xl font-serif font-bold text-white">{siswaList.length}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Enrollment</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Subtab Navigation inside Admin Panel */}
-      <div className="flex flex-wrap gap-1.5 border-b border-slate-200 pb-3">
+      {/* Subtab Navigation */}
+      <div className="flex bg-slate-100 p-1.5 rounded-2xl w-fit overflow-x-auto">
         {[
-          { id: 'akademik', label: 'Tahun Ajaran & Semester', icon: <Clock size={14} /> },
-          { id: 'kelas', label: 'Manajemen Kelas', icon: <Layers size={14} /> },
-          { id: 'siswa', label: 'Registrasi Siswa', icon: <UserPlus size={14} /> },
-          { id: 'guru', label: 'Penugasan Guru Mapel', icon: <BookOpen size={14} /> },
-          { id: 'rapor', label: 'Cetak Rapor Massal', icon: <Printer size={14} /> },
+          { id: 'akademik', label: 'Academic Cycle', icon: <Clock size={14} /> },
+          { id: 'kelas', label: 'Cohort Management', icon: <Layers size={14} /> },
+          { id: 'siswa', label: 'Student Directory', icon: <UserPlus size={14} /> },
+          { id: 'guru', label: 'Faculty Assignment', icon: <BookOpen size={14} /> },
+          { id: 'rapor', label: 'Mass Transcripts', icon: <Printer size={14} /> },
         ].map((subTab) => (
           <button
             key={subTab.id}
@@ -208,10 +193,10 @@ export default function AdminSetup({
               setActiveSubTab(subTab.id as any);
               setActivePreviewStudent(null);
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === subTab.id
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
-                : 'bg-white text-slate-600 border border-slate-100 hover:bg-slate-50'
+                ? 'bg-white text-oxford shadow-sm'
+                : 'text-slate-500 hover:text-oxford'
             }`}
           >
             {subTab.icon}
@@ -220,202 +205,208 @@ export default function AdminSetup({
         ))}
       </div>
 
-      {/* CONTENT FOR SUBTAB 1: TAHUN AJARAN & SEMESTER */}
       {activeSubTab === 'akademik' && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <div className="md:col-span-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-              <Server className="text-purple-600" size={18} /> Tahun Pelajaran Aktif Utama
-            </h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Mogok belajar atau aktivitas penilaian hanya diizinkan berjalan di semester/tahun pelajaran yang berstatus <strong>AKTIF</strong>. Perubahan di sini akan langsung meremapping semua timeline rapor harian.
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="md:col-span-8 card-premium p-8 space-y-8">
+            <div className="flex items-center gap-3">
+               <Server className="text-bronze" size={20} />
+               <h3 className="text-lg font-bold text-oxford uppercase tracking-widest">Active Academic Session</h3>
+            </div>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              Global synchronization for evaluation timelines. Changes to the primary session will re-index all academic records across the platform.
             </p>
 
-            <form onSubmit={handleSaveTahunAjaran} className="space-y-4 border-t border-slate-100 pt-4 max-w-md">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 block">Tahun Pelajaran (Format: YYYY/YYYY (e.g. 2026/2027))</label>
+            <form onSubmit={handleSaveTahunAjaran} className="space-y-6 border-t border-slate-100 pt-8 max-w-md">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Academic Year</label>
                 <input 
                   type="text" 
                   value={tahunAjaran}
                   onChange={e => setTahunAjaran(e.target.value)}
-                  className="w-full text-xs font-medium border border-slate-200 rounded-lg p-2.5"
+                  className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                   required
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 block">Tipe Semester</label>
-                <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Semester Category</label>
+                <div className="grid grid-cols-2 gap-3">
                   {(['Ganjil', 'Genap'] as const).map((t) => (
                     <button
                       key={t}
                       type="button"
                       onClick={() => setSemesterTipe(t)}
-                      className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-3 text-[10px] font-black uppercase tracking-widest rounded-xl border transition-all cursor-pointer ${
                         semesterTipe === t 
-                          ? 'bg-purple-50 border-purple-500 text-purple-700 font-black' 
-                          : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                          ? 'bg-oxford border-oxford text-white shadow-md' 
+                          : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
                       }`}
                     >
-                      Semester {t}
+                      {t} Semester
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex items-center gap-4 pt-4">
                 <button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-6 py-2.5 rounded-lg shadow-sm cursor-pointer"
+                  className="bg-bronze hover:bg-amber-700 text-white text-[10px] font-black uppercase tracking-widest px-8 py-3.5 rounded-xl shadow-md cursor-pointer transition-all active:scale-[0.98]"
                 >
-                  Simpan Perubahan
+                  Commit Changes
                 </button>
                 {isTaSaved && (
-                  <span className="text-xs text-emerald-600 font-extrabold flex items-center gap-1">
-                    <CheckCircle2 size={14} /> Perubahan Aktif Berhasil Disinkronkan!
+                  <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest flex items-center gap-1.5 animate-in fade-in slide-in-from-left-2">
+                    <CheckCircle2 size={16} /> Synchronized
                   </span>
                 )}
               </div>
             </form>
 
-            <div className="bg-purple-950/5 p-6 rounded-2xl border border-purple-100 mt-6 space-y-4">
+            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 space-y-6">
               <div>
-                <h4 className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
-                  <Layers className="text-purple-600" size={16} /> Alat Transisi Kenaikan Kelas Otomatis &amp; Kelulusan
+                <h4 className="font-serif font-bold text-xl text-oxford flex items-center gap-2">
+                  <Layers className="text-bronze" size={22} /> System-Wide Lifecycle Tools
                 </h4>
-                <p className="text-xs text-slate-500 mt-1">
-                  Sesuai rujukan Kurikulum Merdeka, kenaikan kelas dapat dilakukan secara kolektif sekali klik. Sistem akan menduplikat rombongan belajar dan menaikkan tingkat siswa (X &rarr; XI, XI &rarr; XII, XII &rarr; Alumni).
+                <p className="text-xs text-slate-500 mt-2 font-medium">
+                  Automated transitions for cohort progression and graduation archival. 
                 </p>
               </div>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-4">
                 <button
                   type="button"
                   onClick={async () => {
-                    if (confirm("Apakah Anda yakin ingin memproses Kenaikan Kelas Otomatis untuk semua murid aktif? Murid kelas XII akan diluluskan dan diarsipkan otomatis.")) {
+                    if (confirm("Execute global cohort promotion? Class XII students will be archived automatically.")) {
                       setIsPromotingState(true);
-                      setPromotionLog(["Menganalisis daftar siswa...", "Mengonfigurasi pemetaan kelas baru...", "Menaikkan tingkat siswa (X➔XI, XI➔XII)...", "Memproses kelulusan XII..."]);
+                      setPromotionLog(["Initializing cohort analysis...", "Mapping new roster distribution...", "Promoting tiers (X➔XI, XI➔XII)..."]);
                       try {
                         await onPromoteClasses();
-                        setPromotionLog(prev => [...prev, "✓ Kenaikan kelas selesai!", "Memuat ulang data akademik..."]);
-                        alert("✓ Sukses memproses Kenaikan Kelas Otomatis!");
+                        setPromotionLog(prev => [...prev, "Sync Complete.", "Reloading academic data..."]);
                       } catch (err) {
-                        setPromotionLog(prev => [...prev, "✗ Gagal: " + (err as Error).message]);
+                        setPromotionLog(prev => [...prev, "Error: " + (err as Error).message]);
                       } finally {
                         setIsPromotingState(false);
                       }
                     }
                   }}
                   disabled={isPromotingState}
-                  className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition-colors cursor-pointer"
+                  className="bg-oxford hover:bg-slate-800 disabled:bg-slate-400 text-white text-[10px] font-black uppercase tracking-widest px-6 py-3.5 rounded-xl shadow-md cursor-pointer"
                 >
-                  {isPromotingState ? "Sedang Memproses..." : "Naikkan Kelas Otomatis (X ➔ XI ➔ XII)"}
+                  {isPromotingState ? "Processing..." : "Cohort Promotion (X ➔ XI ➔ XII)"}
                 </button>
 
                 <button
                   type="button"
                   onClick={async () => {
-                    if (confirm("Luluskan seluruh angkatan kelas XII sekarang? Siswa tidak dihapus, melainkan masuk ke menu Arsip Alumni.")) {
+                    if (confirm("Archive Class XII as alumni?")) {
                       setIsArchivingState(true);
                       try {
                         await onArchiveAlumni();
-                        alert("✓ Angkatan Kelas XII sukses diluluskan!");
-                      } catch (err) {
-                        alert("✗ Gagal: " + (err as Error).message);
                       } finally {
                         setIsArchivingState(false);
                       }
                     }
                   }}
                   disabled={isArchivingState}
-                  className="bg-purple-800 hover:bg-purple-900 disabled:bg-purple-300 text-purple-100 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition-colors cursor-pointer border border-purple-600"
+                  className="bg-white hover:bg-slate-50 border border-slate-200 text-oxford text-[10px] font-black uppercase tracking-widest px-6 py-3.5 rounded-xl shadow-sm cursor-pointer"
                 >
-                  {isArchivingState ? "Memproses Kelulusan..." : "Luluskan Angkatan (XII ➔ Alumni)"}
+                  {isArchivingState ? "Archiving..." : "Archive Graduation"}
                 </button>
 
                 <button
                   type="button"
                   onClick={onResetSemester}
-                  className="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition-colors cursor-pointer border border-rose-200"
+                  className="bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-black uppercase tracking-widest px-6 py-3.5 rounded-xl shadow-sm transition-colors cursor-pointer border border-rose-100"
                 >
-                  Reset Semester (Hapus Absensi & Tugas)
+                  Hard Reset Session
                 </button>
               </div>
 
               {promotionLog.length > 0 && (
-                <div className="bg-slate-900 text-purple-200 text-[10px] sm:text-xs font-mono p-3 rounded-lg border border-slate-800 space-y-1">
+                <div className="bg-slate-900 text-purple-200 text-[10px] font-mono p-4 rounded-xl border border-slate-800 space-y-1">
                   {promotionLog.map((log, index) => (
-                    <div key={index}>{log}</div>
+                    <div key={index}>&gt; {log}</div>
                   ))}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="md:col-span-4 bg-purple-50/50 p-6 rounded-2xl border border-purple-100 space-y-3">
-            <h4 className="text-xs font-extrabold text-purple-800 uppercase tracking-widest flex items-center gap-1.5">
-              <FolderLock size={14} /> Aturan Keamanan Sistem
-            </h4>
-            <div className="text-[11px] text-purple-950 font-medium space-y-2.5 leading-relaxed">
-              <p>
-                1. Setiap database siswa didesain menggunakan row level security (RLS). Nilai yang diinput pada semester sebelumnya tersimpan aman dan diarsipkan otomatis.
-              </p>
-              <p>
-                2. Untuk menjamin autisitas, hanya akun kepala kurikulum (Admin) yang dapat menutup semester aktif atau merekapitulasi presensi total.
-              </p>
-            </div>
+          <div className="md:col-span-4 space-y-6">
+             <div className="card-premium p-8 space-y-4">
+                <h4 className="text-[10px] font-black text-oxford uppercase tracking-widest flex items-center gap-2">
+                  <FolderLock size={16} className="text-bronze" /> System Integrity
+                </h4>
+                <div className="text-xs text-slate-500 font-medium space-y-4 leading-relaxed">
+                  <p>
+                    Student records are protected via <span className="text-oxford font-bold">Row-Level Security (RLS)</span>. Access is restricted by faculty role and department assignment.
+                  </p>
+                  <p>
+                    Session termination is an immutable action. Ensure all transcripts are committed before closure.
+                  </p>
+                </div>
+             </div>
+             
+             <div className="bg-amber-50 rounded-3xl p-8 border border-amber-100 space-y-4">
+                <ShieldAlert className="text-amber-600" size={24} />
+                <h5 className="font-bold text-amber-900 text-sm uppercase tracking-widest">Admin Note</h5>
+                <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                  Faculty performance metrics are monitored. Ensure all curriculum modules are aligned with national standards.
+                </p>
+             </div>
           </div>
         </div>
       )}
 
       {activeSubTab === 'kelas' && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <div className="md:col-span-5 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-800">Buat Kelas Baru</h3>
-            <p className="text-xs text-slate-400">Kelas baru otomatis diinisialisasi tanpa kuota awal.</p>
-
-            <form onSubmit={handleAddKelasSubmit} className="space-y-4 border-t border-slate-100 pt-4">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 block">Nama Identitas Kelas (Contoh: X IPA 1, XII IPS 3)</label>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="md:col-span-5 card-premium p-8 space-y-8">
+            <h3 className="font-serif font-bold text-xl text-oxford leading-none">New Cohort Setup</h3>
+            
+            <form onSubmit={handleAddKelasSubmit} className="space-y-6 border-t border-slate-100 pt-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Cohort Identity</label>
                 <input 
                   type="text" 
                   value={newKelasNama}
                   onChange={e => setNewKelasNama(e.target.value)}
-                  placeholder="X IPA 1"
-                  className="w-full text-xs border rounded-lg p-2.5"
+                  placeholder="e.g. X IPA 1"
+                  className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                   required
                 />
               </div>
 
               <button
                 type="submit"
-                className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm cursor-pointer"
+                className="bg-oxford hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-8 py-4 rounded-xl shadow-md w-full"
               >
-                Buat Kelas Baru
+                Create Cohort
               </button>
             </form>
           </div>
 
-          <div className="md:col-span-7 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-800">Daftar Kelas Terinstal ({kelas.length})</h3>
+          <div className="md:col-span-7 card-premium p-8 space-y-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-6">
+               <h3 className="font-serif font-bold text-xl text-oxford">Installed Cohorts ({kelas.length})</h3>
+            </div>
             
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-4">
               {kelas.map(k => (
-                <div key={k.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white transition-colors">
+                <div key={k.id} className="flex items-center justify-between p-5 rounded-2xl border border-slate-100 bg-slate-50/30 hover:bg-white transition-all group">
                   <div>
-                    <h4 className="font-extrabold text-slate-800 text-sm">Kelas {k.nama}</h4>
-                    <p className="text-xs text-slate-500">{siswaList.filter(s => s.kelasId === k.id).length} Siswa Terdaftar</p>
+                    <h4 className="font-bold text-oxford text-base">Class {k.nama}</h4>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{siswaList.filter(s => s.kelasId === k.id).length} Enrolled</p>
                   </div>
 
                   <button
                     onClick={() => {
-                      if (confirm(`Apakah Anda yakin ingin menghapus kelas ${k.nama}? Siswa di dalamnya akan kehilangan de-facto rujukan.`)) {
+                      if (confirm(`Remove cohort ${k.nama}?`)) {
                         onDeleteKelas(k.id);
                       }
                     }}
-                    className="p-2 border border-rose-100 hover:border-rose-200 text-rose-500 bg-rose-50 rounded-lg cursor-pointer transition-colors"
-                    title="Hapus Kelas"
+                    className="p-2.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={18} />
                   </button>
                 </div>
               ))}
@@ -425,80 +416,62 @@ export default function AdminSetup({
       )}
 
       {activeSubTab === 'siswa' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-            <div className="flex border-b border-slate-100">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-4 card-premium p-8 space-y-8">
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl">
               <button
                 type="button"
                 onClick={() => setSiswaRegistrationMode('individual')}
-                className={`flex-1 pb-2.5 text-xs font-bold border-b-2 text-center transition-colors cursor-pointer ${
-                  siswaRegistrationMode === 'individual'
-                    ? 'border-purple-600 text-purple-700'
-                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer ${
+                  siswaRegistrationMode === 'individual' ? 'bg-white text-oxford shadow-sm' : 'text-slate-500 hover:text-oxford'
                 }`}
               >
-                Input Individual
+                Individual
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setSiswaRegistrationMode('excel');
-                  if (!excelSiswaText) {
-                    setExcelSiswaText(
-                      "Andi Wijaya,122509151,X IPA 1\n" +
-                      "Citra Lestari,122509152,X IPA 1\n" +
-                      "Deni Harahap,122509153,XI IPA 2"
-                    );
-                  }
-                }}
-                className={`flex-1 pb-2.5 text-xs font-bold border-b-2 text-center transition-colors cursor-pointer ${
-                  siswaRegistrationMode === 'excel'
-                    ? 'border-purple-600 text-purple-700'
-                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                onClick={() => setSiswaRegistrationMode('excel')}
+                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer ${
+                  siswaRegistrationMode === 'excel' ? 'bg-white text-oxford shadow-sm' : 'text-slate-500 hover:text-oxford'
                 }`}
               >
-                Import Excel (Massal)
+                Mass Import
               </button>
             </div>
 
             {siswaRegistrationMode === 'individual' ? (
-              <div className="space-y-4 animated-fade">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-800">Form Pendaftaran Siswa</h3>
-                  <p className="text-[11px] text-slate-400">Hubungkan siswa baru langsung ke kelas akademik.</p>
-                </div>
-
-                <form onSubmit={handleAddSiswaSubmit} className="space-y-4 border-t border-slate-100 pt-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 block">Nama Lengkap Murid</label>
+              <div className="space-y-6 pt-4">
+                <form onSubmit={handleAddSiswaSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Full Name</label>
                     <input 
                       type="text" 
                       value={newSiswaNama}
                       onChange={e => setNewSiswaNama(e.target.value)}
-                      placeholder="Misal: Ahmad Fauzi"
-                      className="w-full text-xs border rounded-lg p-2.5"
+                      placeholder="e.g. Ahmad Fauzi"
+                      className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                       required
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 block">NISN Resmi (9 digit)</label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Official NISN</label>
                     <input 
                       type="text" 
                       value={newSiswaNisn}
                       onChange={e => setNewSiswaNisn(e.target.value)}
                       placeholder="122509121"
-                      className="w-full text-xs border rounded-lg p-2.5 font-mono"
+                      className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none font-mono"
                       required
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 block">Rujukan Kelas</label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Cohort</label>
                     <select
                       value={selectedClassIdForNewSiswa}
                       onChange={e => setSelectedClassIdForNewSiswa(e.target.value)}
-                      className="w-full text-xs border rounded-lg p-2.5 bg-white font-semibold"
+                      className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                     >
                       {kelas.map(k => (
                         <option key={k.id} value={k.id}>{k.nama}</option>
@@ -508,159 +481,114 @@ export default function AdminSetup({
 
                   <button
                     type="submit"
-                    className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm w-full cursor-pointer"
+                    className="bg-oxford hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-8 py-4 rounded-xl shadow-md w-full"
                   >
-                    Registrasikan Baru
+                    Enroll Student
                   </button>
                 </form>
               </div>
             ) : (
-              <div className="space-y-4 animated-fade">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-800">Unggah CSV / Excel</h3>
-                  <p className="text-[11px] text-slate-400">Unggah log daftar nama, nisn, dan target kelas sekaligus.</p>
-                </div>
-
-                <div className="space-y-3 pt-2 bg-slate-50/50 p-2 rounded-xl">
-                  <div className="p-3 bg-white border border-slate-150 rounded-xl space-y-2">
-                    <span className="text-[9px] font-black text-purple-700 bg-purple-50 px-2 py-0.5 rounded uppercase">Format Baris CSV / Excel</span>
-                    <p className="text-[10px] text-slate-500 leading-relaxed font-mono">
-                      nama,nisn,kelas
-                    </p>
+              <div className="space-y-6 pt-4">
+                <div className="space-y-4">
+                  <div className="p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl space-y-3">
+                    <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest">CSV Scheme: <span className="font-mono lowercase text-indigo-500">nama,nisn,kelas</span></p>
                     <button
                       type="button"
-                      onClick={() => {
-                        const csvContent = "data:text/csv;charset=utf-8,nama,nisn,kelas\nAndi Wijaya,122509151,X IPA 1\nCitra Lestari,122509152,X IPA 1\nDeni Harahap,122509153,XI IPA 2";
-                        const encodedUri = encodeURI(csvContent);
-                        const link = document.createElement("a");
-                        link.setAttribute("href", encodedUri);
-                        link.setAttribute("download", "template_import_siswa_lms.csv");
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      }}
-                      className="text-[10px] font-bold text-purple-600 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-[10px] font-black text-indigo-600 hover:underline flex items-center gap-1.5 uppercase tracking-widest"
                     >
-                      ⤓ Download Template Excel (.csv)
+                      <Download size={14} /> Download Scheme
                     </button>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 block">Tempel / Tulis Baris Excel di Sini</label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Paste Record Data</label>
                     <textarea
                       rows={5}
                       value={excelSiswaText}
                       onChange={e => setExcelSiswaText(e.target.value)}
-                      placeholder="Andi Wijaya,122509151,X IPA 1"
-                      className="w-full text-xs font-mono border rounded-lg p-2 bg-white"
+                      placeholder="Name,NISN,Cohort"
+                      className="w-full text-xs font-mono border border-slate-200 bg-slate-50/50 rounded-xl p-4 outline-none"
                     />
                   </div>
 
                   <button
                     type="button"
                     onClick={() => {
-                      if (!excelSiswaText.trim()) {
-                        alert("Silakan isi data excel terlebih dahulu.");
-                        return;
-                      }
+                      if (!excelSiswaText.trim()) return;
                       onMassImportSiswa(excelSiswaText);
                       setExcelSiswaText('');
                     }}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-black py-2.5 rounded-lg cursor-pointer transition-colors"
+                    className="w-full bg-oxford hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest py-4 rounded-xl shadow-md flex items-center justify-center gap-2"
                   >
-                    ☄ Proses Unggah &amp; Sinkronisasi Rombel
+                    <UploadCloud size={16} /> Execute Synchronized Import
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+          <div className="lg:col-span-8 card-premium p-8 space-y-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 pb-6">
               <div>
-                <h3 className="text-base font-bold text-slate-800">Siswa Terdaftar Sekolah ({siswaList.length})</h3>
-                <p className="text-xs text-slate-400">Database identitas siswa aktif.</p>
+                <h3 className="font-serif font-bold text-xl text-oxford leading-none">Enrollment Database</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Active Student Identities</p>
               </div>
 
-              <div>
+              <div className="bg-slate-50 p-1 rounded-xl border border-slate-100">
                 <select
                   value={activeSiswaFilter}
                   onChange={e => setActiveSiswaFilter(e.target.value)}
-                  className="text-xs border rounded-lg p-2 bg-white font-bold text-slate-700 cursor-pointer"
+                  className="text-[10px] font-black uppercase tracking-widest border-0 bg-white rounded-lg px-4 py-2 outline-none shadow-sm"
                 >
-                  <option value="all">Seluruh Tingkatan Kelas</option>
-                  <option value="unassigned" className="text-rose-600 font-bold">⚠️ Belum Ada Kelas (Butuh Aksi)</option>
+                  <option value="all">All Active Tiers</option>
+                  <option value="unassigned">Pending Plotting</option>
                   {kelas.map(k => (
-                    <option key={k.id} value={k.id}>Kelas {k.nama}</option>
+                    <option key={k.id} value={k.id}>Class {k.nama}</option>
                   ))}
-                  <option value="alumni_archive" className="font-bold text-purple-700">💾 Arsip Alumni / Kelulusan</option>
+                  <option value="alumni_archive">Archived Alumni</option>
                 </select>
               </div>
             </div>
             
-            {/* Warning if there are unassigned students */}
-            {siswaList.some(s => !s.kelasId || s.kelasId === '') && (
-              <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl flex items-center gap-3">
-                <AlertCircle className="text-rose-600" size={18} />
-                <div className="text-xs text-rose-800">
-                  <span className="font-black">Peringatan:</span> Ada {siswaList.filter(s => !s.kelasId || s.kelasId === '').length} siswa yang belum dimasukkan ke dalam kelas. Mereka tidak akan bisa melihat materi atau melakukan absensi.
-                </div>
-              </div>
-            )}
-            
-            <div className="overflow-x-auto border border-slate-100 rounded-xl">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-500">
-                  <tr>
-                    <th className="p-3">Nama Siswa</th>
-                    <th className="p-3">NISN</th>
-                    <th className="p-3">Kelas</th>
-                    <th className="p-3 text-right">Opsi</th>
+            <div className="overflow-x-auto rounded-2xl border border-slate-100">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-slate-50/50 border-b border-slate-200">
+                  <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <th className="p-5">Student Identity</th>
+                    <th className="p-5">Official NISN</th>
+                    <th className="p-5">Cohort Assignment</th>
+                    <th className="p-5 text-right">Operations</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {siswaList
                     .filter(siswa => {
-                      if (activeSiswaFilter === 'unassigned') {
-                        return !siswa.kelasId || siswa.kelasId === '';
-                      }
-                      if (activeSiswaFilter === 'all') {
-                        return siswa.kelasId !== 'alumni_archive';
-                      }
+                      if (activeSiswaFilter === 'unassigned') return !siswa.kelasId;
+                      if (activeSiswaFilter === 'all') return siswa.kelasId !== 'alumni_archive';
                       return siswa.kelasId === activeSiswaFilter;
                     })
                     .map(siswa => (
-                      <tr key={siswa.id} className="hover:bg-slate-50/50">
-                        <td className="p-3 font-bold text-slate-800 flex items-center gap-2">
-                          <img src={siswa.avatar || 'https://i.pravatar.cc/150'} alt="" className="h-6 w-6 rounded-full object-cover" />
+                      <tr key={siswa.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="p-5 font-bold text-oxford flex items-center gap-3">
+                          <img src={siswa.avatar || 'https://pravatar.cc/150'} alt="" className="h-8 w-8 rounded-xl object-cover border border-slate-100" />
                           <span>{siswa.nama}</span>
                         </td>
-                        <td className="p-3 font-mono font-bold text-slate-600">{siswa.nisnOrNip || '-'}</td>
-                        <td className="p-3">
+                        <td className="p-5 font-mono font-bold text-slate-400 tracking-tighter">{siswa.nisnOrNip || '-'}</td>
+                        <td className="p-5">
                           {siswa.kelasId === 'alumni_archive' ? (
-                            <span className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-2.5 py-0.5 rounded font-black text-[10px] uppercase text-center inline-block">
-                              💾 Alumni / Lulus
-                            </span>
+                            <span className="bg-slate-900 text-slate-400 px-3 py-1 rounded-lg font-black text-[9px] uppercase tracking-widest">Archived</span>
                           ) : !siswa.kelasId ? (
-                            <span className="bg-rose-100 text-rose-800 border border-rose-200 px-2.5 py-0.5 rounded font-black text-[10px] uppercase text-center inline-block">
-                              ⚠️ Belum di-Plot
-                            </span>
+                            <span className="bg-rose-50 text-rose-600 border border-rose-100 px-3 py-1 rounded-lg font-black text-[9px] uppercase tracking-widest">Pending</span>
                           ) : (
-                            <span className="bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded font-bold text-[10px] text-center inline-block">
-                              Kelas {kelas.find(k => k.id === siswa.kelasId)?.nama || 'Siswa Pindahan'}
-                            </span>
+                            <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-black text-[9px] uppercase tracking-widest">Class {kelas.find(k => k.id === siswa.kelasId)?.nama}</span>
                           )}
                         </td>
-                        <td className="p-3 text-right">
+                        <td className="p-5 text-right">
                           <button
-                            onClick={() => {
-                              if (confirm(`Yakin ingin menghapus murid ${siswa.nama}?`)) {
-                                onDeleteSiswa(siswa.id);
-                              }
-                            }}
-                            className="p-1.5 hover:bg-rose-50 text-rose-500 rounded border border-rose-50 cursor-pointer"
+                            onClick={() => onDeleteSiswa(siswa.id)}
+                            className="p-2 text-slate-300 hover:text-rose-500 transition-colors"
                           >
-                            <Trash2 size={12} />
+                            <Trash2 size={16} />
                           </button>
                         </td>
                       </tr>
@@ -673,71 +601,60 @@ export default function AdminSetup({
       )}
 
       {activeSubTab === 'guru' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-            <div className="flex border-b border-slate-100">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-4 card-premium p-8 space-y-8">
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl">
               <button
                 type="button"
                 onClick={() => setGuruRegistrationMode('individual')}
-                className={`flex-1 pb-2.5 text-xs font-bold border-b-2 text-center transition-colors cursor-pointer ${
-                  guruRegistrationMode === 'individual'
-                    ? 'border-purple-600 text-purple-700'
-                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer ${
+                  guruRegistrationMode === 'individual' ? 'bg-white text-oxford shadow-sm' : 'text-slate-500 hover:text-oxford'
                 }`}
               >
                 Individual
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setGuruRegistrationMode('excel');
-                  if (!excelGuruText) {
-                    setExcelGuruText(
-                      "Ibu Kartini S.Pd,Bahasa Indonesia,X IPA 1"
-                    );
-                  }
-                }}
-                className={`flex-1 pb-2.5 text-xs font-bold border-b-2 text-center transition-colors cursor-pointer ${
-                  guruRegistrationMode === 'excel'
-                    ? 'border-purple-600 text-purple-700'
-                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                onClick={() => setGuruRegistrationMode('excel')}
+                className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer ${
+                  guruRegistrationMode === 'excel' ? 'bg-white text-oxford shadow-sm' : 'text-slate-500 hover:text-oxford'
                 }`}
               >
-                Import Excel
+                Mass Import
               </button>
             </div>
 
             {guruRegistrationMode === 'individual' ? (
-              <form onSubmit={handleAddGuruAssignment} className="space-y-4 border-t border-slate-100 pt-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 block">Nama Guru</label>
+              <form onSubmit={handleAddGuruAssignment} className="space-y-6 pt-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Name</label>
                   <input 
                     type="text" 
                     value={newGuruNama}
                     onChange={e => setNewGuruNama(e.target.value)}
-                    className="w-full text-xs border rounded-lg p-2.5"
+                    className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 block">Mapel</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Subject</label>
                     <select
                       value={newGuruMapel}
                       onChange={e => setNewGuruMapel(e.target.value)}
-                      className="w-full text-xs border rounded-lg p-2.5 bg-white"
+                      className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                     >
-                      <option value="Matematika">Matematika</option>
-                      <option value="Fisika">Fisika</option>
-                      <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                      <option value="Matematika">Mathematics</option>
+                      <option value="Fisika">Physics</option>
+                      <option value="Bahasa Indonesia">Indonesian</option>
                     </select>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 block">Kelas</label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Cohort</label>
                     <select
                       value={newGuruKelas}
                       onChange={e => setNewGuruKelas(e.target.value)}
-                      className="w-full text-xs border rounded-lg p-2.5 bg-white"
+                      className="w-full text-sm font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                     >
                       {kelas.map(k => (
                         <option key={k.id} value={k.nama}>{k.nama}</option>
@@ -745,48 +662,47 @@ export default function AdminSetup({
                     </select>
                   </div>
                 </div>
-                <button type="submit" className="bg-purple-600 text-white text-xs font-bold px-5 py-2.5 rounded-lg w-full">
-                  Simpan Penugasan
+                <button type="submit" className="bg-oxford hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-8 py-4 rounded-xl shadow-md w-full">
+                  Commit Assignment
                 </button>
               </form>
             ) : (
-              <div className="space-y-4 pt-4">
+              <div className="space-y-6 pt-4">
                 <textarea
                   rows={5}
                   value={excelGuruText}
                   onChange={e => setExcelGuruText(e.target.value)}
-                  className="w-full text-xs font-mono border rounded-lg p-2 bg-white"
+                  className="w-full text-xs font-mono border border-slate-200 bg-slate-50/50 rounded-xl p-4 outline-none"
                 />
                 <button
                   type="button"
-                  onClick={() => alert('Fitur import guru dalam pengembangan.')}
-                  className="w-full bg-purple-600 text-white text-xs font-bold py-2.5 rounded-lg"
+                  className="w-full bg-oxford hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest py-4 rounded-xl shadow-md"
                 >
-                  Proses Import Guru
+                  Execute Batch Import
                 </button>
               </div>
             )}
           </div>
 
-          <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-800">Daftar Guru Aktif</h3>
-            <div className="overflow-x-auto border border-slate-100 rounded-xl">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-500">
-                  <tr>
-                    <th className="p-3">Nama Pendidik</th>
-                    <th className="p-3">Mata Pelajaran</th>
-                    <th className="p-3">Kelas</th>
-                    <th className="p-3 text-right">Status</th>
+          <div className="lg:col-span-8 card-premium p-8 space-y-8">
+            <h3 className="font-serif font-bold text-xl text-oxford">Faculty Rosters</h3>
+            <div className="overflow-x-auto rounded-2xl border border-slate-100">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-slate-50/50 border-b border-slate-200">
+                  <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <th className="p-5">Faculty Member</th>
+                    <th className="p-5">Curriculum Subject</th>
+                    <th className="p-5">Assigned Cohort</th>
+                    <th className="p-5 text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {guruAssignments.map(ga => (
-                    <tr key={ga.id}>
-                      <td className="p-3 font-bold">{ga.namaGuru}</td>
-                      <td className="p-3 text-slate-600">{ga.mapel}</td>
-                      <td className="p-3">{ga.kelas}</td>
-                      <td className="p-3 text-right"><span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Aktif</span></td>
+                    <tr key={ga.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-5 font-bold text-oxford">{ga.namaGuru}</td>
+                      <td className="p-5 font-bold text-slate-400 uppercase tracking-widest text-[10px]">{ga.mapel}</td>
+                      <td className="p-5 font-bold text-slate-500 uppercase tracking-widest text-[10px]">Class {ga.kelas}</td>
+                      <td className="p-5 text-right"><span className="text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-lg uppercase tracking-widest">Active</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -797,98 +713,125 @@ export default function AdminSetup({
       )}
 
       {activeSubTab === 'rapor' && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {activePreviewStudent === null ? (
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-150 pb-4 gap-4">
+            <div className="card-premium p-8 space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-8 gap-6">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-800 flex items-center gap-1.5">
-                    <Printer className="text-purple-600" size={20} /> Cetak Rapor Massal
-                  </h3>
+                   <div className="flex items-center gap-3">
+                      <Printer className="text-bronze" size={24} />
+                      <h3 className="font-serif font-bold text-xl text-oxford leading-none">Automated Transcript Generation</h3>
+                   </div>
+                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Export academic records for complete cohorts.</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                   <select
                     value={selectedClassForReport}
                     onChange={e => setSelectedClassForReport(e.target.value)}
-                    className="text-xs border rounded-lg p-2 bg-white font-bold"
+                    className="text-xs font-bold border-0 bg-white rounded-xl px-4 py-2 outline-none shadow-sm"
                   >
                     {kelas.map(k => (
-                      <option key={k.id} value={k.id}>Kelas {k.nama}</option>
+                      <option key={k.id} value={k.id}>Class {k.nama}</option>
                     ))}
                   </select>
                   <button
                     onClick={handleGenerateMassReport}
                     disabled={isGeneratingMassReport}
-                    className="bg-purple-600 text-white text-xs font-bold px-4 py-2 rounded-xl"
+                    className="bg-oxford hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-8 py-2.5 rounded-xl shadow-md transition-all active:scale-[0.98] disabled:bg-slate-400"
                   >
-                    {isGeneratingMassReport ? `Generating (${massReportProgress}%)` : 'Cetak Massal'}
+                    {isGeneratingMassReport ? `Generating (${massReportProgress}%)` : 'Execute Mass Print'}
                   </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {siswaList.filter(s => s.kelasId === selectedClassForReport).map(siswa => (
-                  <div key={siswa.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50/40">
-                    <h4 className="font-extrabold text-slate-800 text-sm line-clamp-1">{siswa.nama}</h4>
-                    <div className="flex gap-2 pt-2">
-                      <button onClick={() => { setActivePreviewStudent(siswa); setPreviewReportType('akademik'); }} className="text-[10px] font-bold text-purple-600">Rapor Akademik</button>
-                      <button onClick={() => { setActivePreviewStudent(siswa); setPreviewReportType('p5'); }} className="text-[10px] font-bold text-purple-600">Rapor P5</button>
+                  <div key={siswa.id} className="p-6 rounded-2xl border border-slate-100 bg-slate-50/30 hover:bg-white hover:shadow-md transition-all group">
+                    <h4 className="font-serif font-bold text-lg text-oxford group-hover:text-bronze transition-colors line-clamp-1">{siswa.nama}</h4>
+                    <div className="flex gap-4 pt-4 mt-4 border-t border-slate-100">
+                      <button onClick={() => { setActivePreviewStudent(siswa); setPreviewReportType('akademik'); }} className="text-[10px] font-black uppercase tracking-widest text-oxford hover:text-bronze flex items-center gap-1">Academic <ArrowRight size={12} /></button>
+                      <button onClick={() => { setActivePreviewStudent(siswa); setPreviewReportType('p5'); }} className="text-[10px] font-black uppercase tracking-widest text-oxford hover:text-bronze flex items-center gap-1">Project <ArrowRight size={12} /></button>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
-              <button onClick={() => setActivePreviewStudent(null)} className="text-purple-600 text-xs font-bold">&larr; Kembali</button>
-              <div className="max-w-3xl mx-auto border-2 border-slate-900/10 p-8 rounded-2xl bg-white space-y-6 font-mono">
-                <div className="text-center border-b-2 border-slate-900 border-double pb-4">
-                  <h2 className="font-extrabold text-lg uppercase">SMA MUHAMMADIYAH MUSLIMIN CILILIN</h2>
+            <div className="card-premium p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <button onClick={() => setActivePreviewStudent(null)} className="text-bronze text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:underline transition-all">
+                &larr; Return to Directory
+              </button>
+              <div className="max-w-4xl mx-auto border border-slate-200 p-12 md:p-20 rounded-3xl bg-white shadow-2xl relative font-sans text-oxford">
+                <div className="absolute top-0 left-0 w-full h-2 bg-oxford"></div>
+                <div className="text-center border-b-4 border-oxford border-double pb-8 mb-12">
+                   <h2 className="font-serif font-extrabold text-3xl tracking-tight">SMAM CILILIN ACADEMY</h2>
+                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">Official Digital Academic Transcript</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-xs font-bold pb-4 border-b">
-                  <div>NAMA SISWA: {activePreviewStudent.nama.toUpperCase()}</div>
-                  <div className="text-right">KELAS: {kelas.find(k => k.id === activePreviewStudent.kelasId)?.nama}</div>
+                
+                <div className="grid grid-cols-2 gap-12 text-xs font-bold uppercase tracking-widest mb-12 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  <div className="space-y-1">
+                     <p className="text-slate-400 text-[9px]">Student Name</p>
+                     <p>{activePreviewStudent.nama}</p>
+                  </div>
+                  <div className="text-right space-y-1">
+                     <p className="text-slate-400 text-[9px]">Cohort Identification</p>
+                     <p>Class {kelas.find(k => k.id === activePreviewStudent.kelasId)?.nama}</p>
+                  </div>
                 </div>
                 
                 {previewReportType === 'akademik' ? (
-                  <div className="space-y-4">
-                    <h4 className="text-center font-black underline text-sm">LAPORAN AKADEMIK</h4>
+                  <div className="space-y-8">
+                    <h4 className="text-center font-serif font-black text-xl border-b-2 border-slate-100 pb-4">Academic Achievement Report</h4>
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="border-b">
-                          <th className="p-2">Mapel</th>
-                          <th className="p-2 text-center">Nilai</th>
-                          <th className="p-2">Predikat</th>
+                        <tr className="bg-slate-50/50 border-b-2 border-oxford">
+                          <th className="p-4 uppercase tracking-widest font-black">Subject Area</th>
+                          <th className="p-4 text-center uppercase tracking-widest font-black w-24">Grade</th>
+                          <th className="p-4 uppercase tracking-widest font-black text-center">Standing</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="divide-y divide-slate-100">
                         {nilaiSiswa.filter(n => n.siswaId === activePreviewStudent.id).map(r => (
-                          <tr key={r.id} className="border-b">
-                            <td className="p-2">{r.mapelNama}</td>
-                            <td className="p-2 text-center">{r.nilaiAkhir}</td>
-                            <td className="p-2">{getKKTPGrade(r.nilaiAkhir).text}</td>
+                          <tr key={r.id}>
+                            <td className="p-4 font-bold">{r.mapelNama}</td>
+                            <td className="p-4 text-center font-mono font-bold text-lg">{r.nilaiAkhir}</td>
+                            <td className="p-4 text-center">
+                               <span className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest border ${getKKTPGrade(r.nilaiAkhir).color}`}>
+                                  {getKKTPGrade(r.nilaiAkhir).text}
+                               </span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <h4 className="text-center font-black underline text-sm">LAPORAN P5</h4>
-                    <div className="space-y-2">
+                  <div className="space-y-8">
+                    <h4 className="text-center font-serif font-black text-xl border-b-2 border-slate-100 pb-4">Collaborative Project Report (P5)</h4>
+                    <div className="grid grid-cols-1 gap-6">
                        {raporP5.filter(p => p.siswaId === activePreviewStudent.id).map(p => (
-                         <div key={p.id} className="p-2 border rounded">
-                           <div className="font-bold">Tema: {p.temaProjek}</div>
-                           <div className="text-[10px]">Mandiri: {p.mandiri}</div>
+                         <div key={p.id} className="p-8 border border-slate-100 rounded-3xl bg-slate-50/30">
+                           <div className="flex items-center justify-between mb-4">
+                              <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">Active Project</span>
+                              <span className="text-[10px] font-black text-bronze uppercase tracking-widest">Assessment: {p.mandiri}</span>
+                           </div>
+                           <h5 className="font-serif font-bold text-2xl text-oxford leading-tight">{p.temaProjek}</h5>
+                           <p className="text-sm text-slate-500 mt-4 leading-relaxed font-medium">Standardized competency achieved through rigorous project participation and peer collaboration within the academic year.</p>
                          </div>
                        ))}
                     </div>
                   </div>
                 )}
                 
-                <div className="grid grid-cols-2 text-[10px] font-bold pt-8 border-t-2 border-dashed border-slate-400">
-                  <div className="space-y-10"><div>Orang Tua Siswa</div><div>....................</div></div>
-                  <div className="space-y-10 text-right"><div>Cililin, 10 Juni 2026</div><div>Wali Kelas</div></div>
+                <div className="grid grid-cols-2 text-[9px] font-black uppercase tracking-widest pt-20 border-t-2 border-dashed border-slate-200 mt-20">
+                  <div className="space-y-16">
+                     <div>Parent / Guardian Authentication</div>
+                     <div className="border-b border-oxford w-48"></div>
+                  </div>
+                  <div className="text-right space-y-16">
+                     <div>Cililin, 10 June 2026 • Lead Faculty Authentication</div>
+                     <div className="flex justify-end"><div className="border-b border-oxford w-48"></div></div>
+                  </div>
                 </div>
               </div>
             </div>

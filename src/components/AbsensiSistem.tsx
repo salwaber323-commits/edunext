@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, CheckSquare, Plus, AlertCircle, FileText, UserCheck, Eye, Trash2, CheckCircle2 } from 'lucide-react';
+import { Calendar, Clock, CheckCircle2, XCircle, Circle, PlayCircle, ClipboardList, UserCheck } from 'lucide-react';
 import { AbsensiPertemuan, User, UserRole, Kelas } from '../types';
 
 interface AbsensiSistemProps {
@@ -25,212 +25,194 @@ export default function AbsensiSistem({
   onUpdatePresence
 }: AbsensiSistemProps) {
   
-  // Local form states
   const [newAbsKelasId, setNewAbsKelasId] = useState('kelas_x_ipa_1');
   const [newAbsMapelNama, setNewAbsMapelNama] = useState('Matematika');
-  const [newAbsTanggal, setNewAbsTanggal] = useState('2026-06-10'); // Simulated Today
+  const [newAbsTanggal, setNewAbsTanggal] = useState('2026-06-10'); 
 
   const [recapMode, setRecapMode] = useState(false);
   const [selectedRecapClassId, setSelectedRecapClassId] = useState(kelas[0]?.id || '');
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
 
-  // Filter students by class for quick register
   const getSiswaForClass = (clsId: string) => {
     return siswaList.filter(s => s.kelasId === clsId);
   };
 
-  const getSiswaMapelName = (mapelId: string) => {
-    return mapelId === 'mapel_matematika' ? 'Matematika' :
-           mapelId === 'mapel_indonesia' ? 'Bahasa Indonesia' : 'Fisika';
-  };
-
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto px-1">
+    <div className="space-y-8 w-full max-w-7xl mx-auto pb-10">
       
       {/* Title block */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-        <h2 className="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
-          <Calendar className="text-blue-600" size={24} /> Portal Absensi Kelas Mandiri
-        </h2>
-        <p className="text-slate-500 text-xs md:text-sm mt-1">
-          Sistem absensi berbasis KBM digital. Murid dapat melakukan klik absensi mandiri, sedangkan Guru memegang kendali pembukaan dan validasi data.
-        </p>
+      <div className="card-premium p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+           <div className="flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                 <Calendar size={20} strokeWidth={2.5} />
+              </div>
+              <h2 className="text-2xl font-serif font-bold text-oxford">Attendance Management</h2>
+           </div>
+           <p className="text-slate-500 text-sm max-w-xl">
+             Academic verification system. Students mark individual presence while Faculty maintains control over session validation and data integrity.
+           </p>
+        </div>
 
         {role === 'guru' && (
-          <div className="flex gap-2 mt-4">
+          <div className="flex bg-slate-100 p-1.5 rounded-2xl shrink-0 self-start md:self-auto">
             <button
               onClick={() => setRecapMode(false)}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${!recapMode ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
+              className={`flex items-center gap-2 px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all cursor-pointer ${!recapMode ? 'bg-white text-oxford shadow-sm' : 'text-slate-500 hover:text-oxford'}`}
             >
-              Manajemen Sesi
+              <PlayCircle size={14} /> Session Control
             </button>
             <button
               onClick={() => {
                 setRecapMode(true);
                 setSelectedRecapClassId(newAbsKelasId);
               }}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${recapMode ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`}
+              className={`flex items-center gap-2 px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all cursor-pointer ${recapMode ? 'bg-white text-oxford shadow-sm' : 'text-slate-500 hover:text-oxford'}`}
             >
-              Rekapitulasi Absensi
+              <ClipboardList size={14} /> Recap Data
             </button>
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* VIEW 1: GURU CONTROL SYSTEM */}
         {role === 'guru' && !recapMode && (
           <>
-            {/* Left box: Create Daily Attendance (4 cols) */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
-                <h3 className="font-bold text-slate-800 text-base border-b border-slate-100 pb-3">Buka Absensi Baru</h3>
+              <div className="card-premium p-8 space-y-6">
+                <h3 className="font-bold text-oxford text-sm uppercase tracking-widest border-b border-slate-100 pb-4">Initiate Session</h3>
                 
-                <div className="space-y-4 text-xs font-bold text-slate-500">
-                  <div>
-                    <label className="block mb-1.5">Pilih Rombel / Kelas</label>
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Cohort / Class</label>
                     <select 
                       value={newAbsKelasId}
                       onChange={e => setNewAbsKelasId(e.target.value)}
-                      className="w-full text-xs text-slate-800 border border-slate-200 bg-white rounded-lg px-3 py-2.5"
+                      className="w-full text-xs font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none focus:border-bronze transition-colors"
                     >
                       {kelas.map(k => (
-                        <option key={k.id} value={k.id}>Kelas {k.nama}</option>
+                        <option key={k.id} value={k.id}>Class {k.nama}</option>
                       ))}
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block mb-1.5">Mata Pelajaran</label>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Curriculum Subject</label>
                     <select
                       value={newAbsMapelNama}
                       onChange={e => setNewAbsMapelNama(e.target.value)}
-                      className="w-full text-xs text-slate-800 border border-slate-200 bg-white rounded-lg px-3 py-2.5"
+                      className="w-full text-xs font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none focus:border-bronze transition-colors"
                     >
-                      <option value="Matematika">Matematika</option>
-                      <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                      <option value="Fisika">Fisika</option>
+                      <option value="Matematika">Mathematics</option>
+                      <option value="Bahasa Indonesia">Indonesian Language</option>
+                      <option value="Fisika">Physics</option>
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block mb-1.5">Tanggal Pertemuan</label>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Session Date</label>
                     <input 
                       type="date" 
                       value={newAbsTanggal}
                       onChange={e => setNewAbsTanggal(e.target.value)}
-                      className="w-full text-xs text-slate-800 border border-slate-200 bg-white rounded-lg px-3 py-2"
+                      className="w-full text-xs font-bold text-oxford border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 outline-none"
                     />
                   </div>
                   
                   <button
-                    id="btn-trigger-buka-absen"
                     onClick={() => {
                       const mapelId = newAbsMapelNama === 'Matematika' ? 'mapel_matematika' :
                                       newAbsMapelNama === 'Bahasa Indonesia' ? 'mapel_indonesia' : 'mapel_fisika';
                       onOpenNewAbsensi(newAbsKelasId, mapelId, newAbsMapelNama, newAbsTanggal);
-                      alert(`✓ Absensi ${newAbsMapelNama} berhasil dibuka untuk kelas dan siswa`);
                     }}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-xs cursor-pointer shadow-sm transition-all"
+                    className="w-full bg-oxford hover:bg-slate-800 text-white font-bold py-4 rounded-xl text-[10px] uppercase tracking-widest cursor-pointer shadow-md transition-all active:scale-[0.98]"
                   >
-                    Mulai Sesi Absen [ Buka Absensi ]
+                    Open Session
                   </button>
                 </div>
               </div>
 
-              <div className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 text-xs text-slate-500">
-                <h4 className="font-bold text-slate-700 mb-2">Petunjuk Guru:</h4>
-                <p className="leading-relaxed">
-                  Setelah membuka absen, siswa di kelas terkait akan mendapatkan card tombol <strong>[ Hadir ]</strong> otomatis saat login di akun siswa.
-                </p>
+              <div className="bg-blue-50/50 rounded-2xl p-6 border border-blue-100/50 text-[11px] text-blue-800 leading-relaxed font-medium">
+                <div className="flex gap-2 items-start">
+                   <Clock size={14} className="mt-0.5 shrink-0" />
+                   <p>Session access is live immediately for enrolled students upon activation. Data synchronization occurs in real-time.</p>
+                </div>
               </div>
             </div>
 
-            {/* Right box: Active attendance sessions and details (8 cols) */}
             <div className="lg:col-span-8 space-y-6">
-              <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
-                <h3 className="font-bold text-slate-800 text-base border-b border-slate-100 pb-3">Riwayat Sesi Absensi Pertemuan</h3>
+              <div className="card-premium p-8 space-y-6">
+                <h3 className="font-bold text-oxford text-sm uppercase tracking-widest border-b border-slate-100 pb-4">Session Archives</h3>
 
                 {meetings.length === 0 ? (
-                  <p className="text-center text-slate-400 text-sm py-8 border border-dashed border-slate-100 rounded-xl">
-                    Belum ada sesi absensi yang dibuat. Silakan buat sesi baru di sebelah kiri.
-                  </p>
+                  <div className="text-center py-20 border-2 border-dashed border-slate-100 rounded-2xl">
+                     <p className="text-slate-400 text-sm font-medium">No active sessions found.</p>
+                  </div>
                 ) : (
                   <div className="space-y-4">
                     {meetings.map(meet => {
                       const activeClassObj = kelas.find(k => k.id === meet.kelasId);
                       const isMeetOpened = meet.isTerbuka;
                       const hasSelectedThis = selectedMeetingId === meet.id;
-                      
-                      // Calculate quick counts
                       const participants = getSiswaForClass(meet.kelasId);
                       const totalHadir = participants.filter(p => meet.kehadiran[p.id] === 'Hadir').length;
                       
                       return (
-                        <div key={meet.id} className={`p-4 rounded-xl border transition-all ${
-                          hasSelectedThis ? 'border-blue-400 bg-blue-50/10' : 'border-slate-100 bg-slate-50/10 hover:bg-slate-50/30'
+                        <div key={meet.id} className={`p-6 rounded-2xl border transition-all ${
+                          hasSelectedThis ? 'border-bronze bg-slate-50/50' : 'border-slate-100 bg-white hover:border-slate-200'
                         }`}>
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                             <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded uppercase tracking-widest">
                                   {meet.mapelNama}
                                 </span>
-                                <span className="text-xs text-slate-400 font-semibold">Rombel: Kelas {activeClassObj?.nama}</span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cohort {activeClassObj?.nama}</span>
                               </div>
-                              <h4 className="font-bold text-slate-800 text-base">Pertemuan Tgl: {meet.tanggal}</h4>
-                              <p className="text-xs text-slate-500 mt-1">Kehadiran tercatat: {totalHadir} dari {participants.length} Siswa</p>
+                              <h4 className="font-bold text-oxford text-lg leading-tight">Session: {meet.tanggal}</h4>
+                              <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">Enrollment: {totalHadir} / {participants.length} Present</p>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                              {/* Open/Close toggle */}
+                            <div className="flex items-center gap-3">
                               <button
-                                id={`toggle-meet-state-${meet.id}`}
                                 onClick={() => onToggleMeetingState(meet.id)}
-                                className={`text-[11px] font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors ${
+                                className={`flex items-center gap-2 text-[10px] font-bold px-4 py-2 rounded-xl cursor-pointer transition-all uppercase tracking-widest ${
                                   isMeetOpened 
-                                    ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' 
-                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                    ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' 
+                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                                 }`}
                               >
-                                {isMeetOpened ? '🟢 Terbuka (Tutup)' : '🔴 Ditutup (Buka)'}
+                                <Circle size={10} className={isMeetOpened ? 'fill-emerald-500' : 'fill-slate-300'} />
+                                {isMeetOpened ? 'Active' : 'Closed'}
                               </button>
 
-                              {/* Toggle roster details */}
                               <button
-                                id={`view-meet-details-${meet.id}`}
                                 onClick={() => setSelectedMeetingId(hasSelectedThis ? null : meet.id)}
-                                className="bg-slate-800 hover:bg-slate-900 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg cursor-pointer"
+                                className="bg-oxford hover:bg-slate-800 text-white text-[10px] font-bold px-5 py-2 rounded-xl cursor-pointer uppercase tracking-widest shadow-sm"
                               >
-                                {hasSelectedThis ? 'Sembunyikan' : 'Kelola Siswa'}
+                                {hasSelectedThis ? 'Hide' : 'Manage'}
                               </button>
                             </div>
                           </div>
 
-                          {/* Detail Roster presence override */}
                           {hasSelectedThis && (
-                            <div className="animated-fade mt-4 pt-4 border-t border-slate-200 space-y-3">
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-                                <h5 className="font-bold text-xs text-slate-500 uppercase tracking-widest">Daftar Kehadiran Siswa</h5>
+                            <div className="mt-8 pt-6 border-t border-slate-200 space-y-6">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <h5 className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">Student Roster</h5>
                                 <div className="flex gap-2">
                                   <button
-                                    onClick={() => {
-                                      participants.forEach(s => onUpdatePresence(meet.id, s.id, 'Hadir'));
-                                      alert('✓ Semua siswa ditandai sebagai HADIR');
-                                    }}
-                                    className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-lg transition-colors border border-emerald-200/50 cursor-pointer"
+                                    onClick={() => participants.forEach(s => onUpdatePresence(meet.id, s.id, 'Hadir'))}
+                                    className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[9px] font-black rounded-lg transition-colors border border-emerald-100"
                                   >
-                                    ✓ Set Semua Hadir (Cepat)
+                                    Mark All Present
                                   </button>
                                   <button
-                                    onClick={() => {
-                                      participants.forEach(s => onUpdatePresence(meet.id, s.id, 'Alpha'));
-                                      alert('✓ Semua siswa ditandai sebagai TANPA KETERANGAN');
-                                    }}
-                                    className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-black rounded-lg transition-colors border border-rose-200/50 cursor-pointer"
+                                    onClick={() => participants.forEach(s => onUpdatePresence(meet.id, s.id, 'Alpha'))}
+                                    className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[9px] font-black rounded-lg transition-colors border border-rose-100"
                                   >
-                                    ✗ Reset Semua Alpha
+                                    Reset to Alpha
                                   </button>
                                 </div>
                               </div>
@@ -239,21 +221,22 @@ export default function AbsensiSistem({
                                 {participants.map(s => {
                                   const currentStatus = meet.kehadiran[s.id] || 'Alpha';
                                   return (
-                                    <div key={s.id} className="flex items-center justify-between p-2.5 rounded-lg bg-white border border-slate-100 text-xs">
-                                      <span className="font-bold text-slate-800">{s.nama}</span>
+                                    <div key={s.id} className="flex items-center justify-between p-3.5 rounded-xl bg-white border border-slate-100 transition-all hover:shadow-sm">
+                                      <span className="font-bold text-oxford text-xs">{s.nama}</span>
                                       
                                       <div className="flex gap-1">
                                         {(['Hadir', 'Izin', 'Sakit', 'Alpha'] as const).map(st => (
                                           <button
                                             key={st}
                                             onClick={() => onUpdatePresence(meet.id, s.id, st)}
-                                            className={`text-[10px] font-bold px-2 py-1 rounded transition-colors cursor-pointer ${
+                                            className={`text-[9px] font-black w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer border ${
                                               currentStatus === st
-                                                ? st === 'Hadir' ? 'bg-emerald-600 text-white' :
-                                                  st === 'Izin' ? 'bg-blue-600 text-white' :
-                                                  st === 'Sakit' ? 'bg-amber-500 text-white' : 'bg-red-500 text-white'
-                                                : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                                                ? st === 'Hadir' ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' :
+                                                  st === 'Izin' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' :
+                                                  st === 'Sakit' ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-red-500 text-white border-red-500 shadow-sm'
+                                                : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
                                             }`}
+                                            title={st}
                                           >
                                             {st[0]}
                                           </button>
@@ -277,54 +260,57 @@ export default function AbsensiSistem({
 
         {/* VIEW 1.B: GURU RECAP SYSTEM */}
         {role === 'guru' && recapMode && (
-          <div className="lg:col-span-12 space-y-6">
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                <h3 className="font-bold text-slate-800 text-base">Rekapitulasi Kehadiran Kelas</h3>
+          <div className="lg:col-span-12 space-y-8">
+            <div className="card-premium p-8 space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 pb-8">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-500">Pilih Kelas:</span>
+                   <ClipboardList className="text-bronze" size={24} />
+                   <h3 className="font-serif font-bold text-xl text-oxford leading-none">Cohort Recapitulation</h3>
+                </div>
+                <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-2">Filter Cohort</span>
                   <select
                     value={selectedRecapClassId}
                     onChange={e => setSelectedRecapClassId(e.target.value)}
-                    className="text-xs font-bold border rounded-lg p-2 bg-white"
+                    className="text-xs font-bold border-0 bg-white rounded-xl px-4 py-2 outline-none shadow-sm"
                   >
                     {kelas.map(k => (
-                      <option key={k.id} value={k.id}>Kelas {k.nama}</option>
+                      <option key={k.id} value={k.id}>Class {k.nama}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-2xl border border-slate-100">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200">
-                      <th className="p-3 font-bold sticky left-0 bg-slate-50 z-10 w-48 border-r border-slate-200">Nama Siswa</th>
+                    <tr className="bg-slate-50/50 border-b border-slate-200">
+                      <th className="p-5 font-bold uppercase tracking-widest text-[10px] text-slate-400 sticky left-0 bg-slate-50 z-10 w-64 border-r border-slate-200">Student Identity</th>
                       {meetings.filter(m => m.kelasId === selectedRecapClassId).map(m => (
-                        <th key={m.id} className="p-3 font-bold border-r border-slate-200 text-center min-w-[100px]">
-                          <div className="text-[10px] text-indigo-600">{m.mapelNama}</div>
-                          <div className="text-[9px] text-slate-400 font-mono">{m.tanggal}</div>
+                        <th key={m.id} className="p-5 font-bold border-r border-slate-200 text-center min-w-[140px]">
+                          <div className="text-[10px] text-blue-600 uppercase tracking-widest mb-1">{m.mapelNama}</div>
+                          <div className="text-[9px] text-slate-400 font-mono tracking-tighter">{m.tanggal}</div>
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {getSiswaForClass(selectedRecapClassId).map(siswa => (
-                      <tr key={siswa.id} className="hover:bg-slate-50/50">
-                        <td className="p-3 font-bold text-slate-700 sticky left-0 bg-white z-10 border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                      <tr key={siswa.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="p-5 font-bold text-oxford sticky left-0 bg-white z-10 border-r border-slate-100 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)]">
                           {siswa.nama}
                         </td>
                         {meetings.filter(m => m.kelasId === selectedRecapClassId).map(m => {
                           const status = m.kehadiran[siswa.id] || '-';
                           return (
-                            <td key={m.id} className="p-3 text-center border-r border-slate-50">
-                              <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg ${
-                                status === 'Hadir' ? 'bg-emerald-100 text-emerald-800' :
-                                status === 'Izin' ? 'bg-blue-100 text-blue-800' :
-                                status === 'Sakit' ? 'bg-amber-100 text-amber-800' :
-                                status === 'Alpha' ? 'bg-red-100 text-red-800' : 'text-slate-300'
+                            <td key={m.id} className="p-5 text-center border-r border-slate-50">
+                              <span className={`text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest ${
+                                status === 'Hadir' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                                status === 'Izin' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                                status === 'Sakit' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
+                                status === 'Alpha' ? 'bg-red-50 text-red-700 border border-red-100' : 'text-slate-300'
                               }`}>
-                                {status.toUpperCase()}
+                                {status}
                               </span>
                             </td>
                           );
@@ -340,51 +326,54 @@ export default function AbsensiSistem({
 
         {/* VIEW 2: SISWA VIEW ATTENDANCE CARDS & HISTORICS */}
         {role === 'siswa' && (
-          <div className="lg:col-span-12 space-y-6">
-            
-            {/* Checked-In or Open check-in panel */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
-              <h3 className="font-bold text-slate-800 text-base border-b border-slate-100 pb-3">
-                Pertemuan Hari Ini yang Sedang Berjalan
-              </h3>
+          <div className="lg:col-span-12 space-y-8">
+            <div className="card-premium p-8 space-y-8">
+              <div className="flex items-center gap-3 border-b border-slate-100 pb-6">
+                 <UserCheck className="text-blue-600" size={24} />
+                 <h3 className="font-serif font-bold text-xl text-oxford leading-none">Active Attendance Sessions</h3>
+              </div>
 
               {meetings.filter(m => m.isTerbuka).length === 0 ? (
-                <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-100 rounded-xl text-slate-400">
-                  <Clock className="mx-auto text-slate-300 mb-2" size={32} />
-                  Belum ada kelas Matematika/Fisika/Indonesia yang dibuka oleh guru hari ini.
+                <div className="py-20 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                  <div className="h-16 w-16 bg-white rounded-full mx-auto flex items-center justify-center mb-4 shadow-sm border border-slate-100">
+                     <Clock className="text-slate-300" size={24} />
+                  </div>
+                  <p className="text-slate-400 font-medium text-sm">No curriculum sessions are currently requiring check-in.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {meetings.filter(m => m.isTerbuka).map(m => {
                     const studentPresence = m.kehadiran[currentUserId];
                     const isRegistered = studentPresence === 'Hadir';
                     
                     return (
-                      <div key={m.id} className="p-5 rounded-2xl border border-blue-50 bg-blue-50/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded uppercase">
-                            Mata Pelajaran
-                          </span>
-                          <h4 className="font-extrabold text-slate-800 text-lg">Pertemuan KBM - {m.mapelNama}</h4>
-                          <p className="text-xs text-slate-500">Tanggal: {m.tanggal} (Batas KBM hari ini)</p>
-                        </div>
+                      <div key={m.id} className="p-8 rounded-3xl border border-blue-100 bg-white shadow-sm ring-1 ring-blue-50 hover:shadow-md transition-all group">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                             <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">
+                               Active Curriculum
+                             </span>
+                             <Clock size={16} className="text-slate-300 group-hover:text-blue-400 transition-colors" />
+                          </div>
+                          <h4 className="font-serif font-bold text-2xl text-oxford leading-tight">{m.mapelNama}</h4>
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest pb-4">
+                             {m.tanggal} • Official Session
+                          </div>
 
-                        <div>
-                          {isRegistered ? (
-                            <div className="flex items-center gap-2 text-emerald-700 bg-emerald-100/70 border border-emerald-200 px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold">
-                              <CheckCircle2 size={16} className="text-emerald-700 shrink-0" /> Kehadiran Berhasil Dicatat
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                onUpdatePresence(m.id, currentUserId, 'Hadir');
-                                alert('✓ Kehadiran berhasil dicatat!');
-                              }}
-                              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl text-xs cursor-pointer shadow-sm w-full sm:w-auto text-center"
-                            >
-                              Centang Kehadiran [ Hadir ]
-                            </button>
-                          )}
+                          <div className="pt-4 border-t border-slate-100">
+                            {isRegistered ? (
+                              <div className="flex items-center justify-center gap-2 text-sage bg-emerald-50 border border-emerald-100 py-4 rounded-2xl text-sm font-black uppercase tracking-widest">
+                                <CheckCircle2 size={20} strokeWidth={3} /> Registered
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => onUpdatePresence(m.id, currentUserId, 'Hadir')}
+                                className="w-full bg-oxford hover:bg-slate-800 text-white font-bold py-4 rounded-2xl text-[10px] uppercase tracking-widest cursor-pointer shadow-md transition-all active:scale-[0.98]"
+                              >
+                                Mark Attendance [ Present ]
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -393,33 +382,32 @@ export default function AbsensiSistem({
               )}
             </div>
 
-            {/* Historic presence log table for Ahmad */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
-              <h3 className="font-bold text-slate-800 text-base border-b border-slate-100 pb-3">Riwayat Kartu Absensi Saya</h3>
+            <div className="card-premium p-8 space-y-8">
+              <h3 className="font-serif font-bold text-xl text-oxford leading-none border-b border-slate-100 pb-6">Individual Academic Logs</h3>
               
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-sans text-xs md:text-sm">
+              <div className="overflow-x-auto rounded-2xl border border-slate-100">
+                <table className="w-full text-left font-sans text-xs">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-100 text-slate-500">
-                      <th className="p-3 font-semibold">Tanggal</th>
-                      <th className="p-3 font-semibold">Mata Pelajaran</th>
-                      <th className="p-3 font-semibold">Validator</th>
-                      <th className="p-3 font-semibold text-center w-36">Status</th>
+                    <tr className="bg-slate-50/50 border-b border-slate-200">
+                      <th className="p-5 font-bold uppercase tracking-widest text-[10px] text-slate-400">Date</th>
+                      <th className="p-5 font-bold uppercase tracking-widest text-[10px] text-slate-400">Subject</th>
+                      <th className="p-5 font-bold uppercase tracking-widest text-[10px] text-slate-400">Validated By</th>
+                      <th className="p-5 font-bold uppercase tracking-widest text-[10px] text-slate-400 text-center w-48">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700">
+                  <tbody className="divide-y divide-slate-100 text-oxford">
                     {meetings.map((meet, index) => {
                       const studentPresence = meet.kehadiran[currentUserId] || 'Alpha';
                       return (
-                        <tr key={index} className="hover:bg-slate-50/40">
-                          <td className="p-3 font-medium text-slate-600">{meet.tanggal}</td>
-                          <td className="p-3 font-bold text-slate-800">{meet.mapelNama}</td>
-                          <td className="p-3 text-xs text-slate-400 font-semibold">Sistem / Pak Budi, S.Pd.</td>
-                          <td className="p-3 text-center">
-                            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full inline-block ${
-                              studentPresence === 'Hadir' ? 'bg-emerald-100 text-emerald-800' :
-                              studentPresence === 'Izin' ? 'bg-blue-100 text-blue-800' :
-                              studentPresence === 'Sakit' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'
+                        <tr key={index} className="hover:bg-slate-50/30 transition-colors">
+                          <td className="p-5 font-medium text-slate-500">{meet.tanggal}</td>
+                          <td className="p-5 font-bold">{meet.mapelNama}</td>
+                          <td className="p-5 text-[10px] text-slate-400 font-bold uppercase tracking-wider">System / Faculty Validation</td>
+                          <td className="p-5 text-center">
+                            <span className={`text-[9px] font-black px-4 py-1.5 rounded-full inline-block uppercase tracking-widest border ${
+                              studentPresence === 'Hadir' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                              studentPresence === 'Izin' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                              studentPresence === 'Sakit' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-red-50 text-red-700 border-red-100'
                             }`}>
                               {studentPresence}
                             </span>
@@ -431,7 +419,6 @@ export default function AbsensiSistem({
                 </table>
               </div>
             </div>
-
           </div>
         )}
 
