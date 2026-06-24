@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Menu, Bell, CheckSquare, Plus, RefreshCw, Calendar, 
-  Award, FileText, BookOpen, User as UserIcon, Info, ArrowLeft, Send, Sparkles, AlertCircle, X, Check, ChevronRight
+  Award, FileText, BookOpen, User as UserIcon, Info, ArrowLeft, Send, Sparkles, AlertCircle, X, Check, ChevronRight, CheckCircle, TrendingUp, Megaphone
 } from 'lucide-react';
 
 import { 
@@ -65,6 +65,12 @@ interface Notification {
   timestamp: string;
 }
 
+interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
 export default function App() {
   // --- CORE STATE ---
   const [role, setRole] = useState<UserRole>('siswa');
@@ -91,6 +97,17 @@ export default function App() {
   const [ekskulList, setEkskulList] = useState<Ekstrakurikuler[]>([]);
   const [pendaftaranKegiatan, setPendaftaranKegiatan] = useState<PendaftaranKegiatan[]>([]);
   const [anggotaEkskul, setAnggotaEkskul] = useState<AnggotaEkskul[]>([]);
+
+  // UI STATES
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const addToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
 
   // REAL-TIME NOTIFICATIONS
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -444,7 +461,7 @@ export default function App() {
       }
     }
     await refreshData();
-    alert(`Sukses mengimpor ${count} siswa!`);
+    addToast(`Successfully imported ${count} students!`, 'success');
   };
 
   const promoteClasses = async () => {
@@ -491,7 +508,7 @@ export default function App() {
     if (confirm("Serius? Ini akan menghapus data absensi dan pengumpulan tugas untuk semester saat ini. Pastikan rapor sudah dicetak!")) {
       await dataService.resetSemester();
       await refreshData();
-      alert("Semester telah di-reset. Data absensi dan tugas lama telah dibersihkan.");
+      addToast("Semester has been reset. Legacy data archived.", 'info');
     }
   };
 
@@ -512,14 +529,14 @@ export default function App() {
     if (!currentUserId) return;
     await dataService.registerKegiatan(kegId, currentUserId);
     await refreshData();
-    alert("Berhasil mendaftar kegiatan!");
+    addToast("Successfully registered for the event.", 'success');
   };
 
   const joinEkskul = async (ekskulId: string) => {
     if (!currentUserId) return;
     await dataService.joinEkskul(ekskulId, currentUserId);
     await refreshData();
-    alert("Berhasil bergabung ke ekskul!");
+    addToast("Organization membership confirmed.", 'success');
   };
 
   const leaveEkskul = async (ekskulId: string) => {
@@ -531,7 +548,7 @@ export default function App() {
   const addAnnouncement = async (ann: any) => {
     await dataService.addAnnouncement(ann);
     await refreshData();
-    alert('Pengumuman sukses diterbitkan!');
+    addToast('Bulletin successfully published to the platform.', 'success');
   };
 
   // Portfolio achievements actions
@@ -627,6 +644,7 @@ export default function App() {
                       <button
                         onClick={() => {
                           setNotifications([]);
+                          addToast("Notifications cleared.", 'info');
                         }}
                         className="text-[10px] text-bronze hover:underline font-bold cursor-pointer"
                       >
@@ -1195,6 +1213,19 @@ export default function App() {
           )}
 
         </main>
+      </div>
+
+      {/* TOAST SYSTEM */}
+      <div className="fixed bottom-8 right-8 z-[100] flex flex-col gap-3">
+        {toasts.map(toast => (
+          <div 
+            key={toast.id} 
+            className="flex items-center gap-3 bg-oxford text-white px-6 py-4 rounded-2xl shadow-premium animate-in fade-in slide-in-from-right-4 duration-300 border border-white/10"
+          >
+            {toast.type === 'success' ? <CheckCircle size={18} className="text-emerald-400" /> : <AlertCircle size={18} className="text-amber-400" />}
+            <span className="text-[10px] font-black uppercase tracking-widest leading-none">{toast.message}</span>
+          </div>
+        ))}
       </div>
 
     </div>
